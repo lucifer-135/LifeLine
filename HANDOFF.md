@@ -6,8 +6,8 @@ Use this file to resume after compaction or a session limit. **Update it after e
 
 ## Status
 
-- **Last updated:** 2026-10-30, Task 5 complete (cloud build session, subagent-driven).
-- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: Task 6 (baseline scenario, runComparison, event copy).
+- **Last updated:** 2026-10-30, Task 6 complete (cloud build session, subagent-driven).
+- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: Task 7 (finance and formatters).
 - **Repo:** GitHub `lucifer-135/LifeLine` (private). Work branch `claude/modest-gauss-c677cd`, draft PR to `main`. Original local clone: `C:\Shivansh\Projects\Global-Energy-Hackathon`.
 - **Files present:**
   - `CLAUDE.md`
@@ -39,7 +39,7 @@ Keep this in sync with PLAN.md.
 | 3 | Loads, solar shape, grid pattern | done | kano-50: life-critical 109.8, essential 90.3, can wait 98.1 kWh/day (298 total). |
 | 4 | Sizing | done | kano-50, seed 2026: battery 85 kWh, PV 41 kWp, inverter 12 kW (longest outage 7.5 h). |
 | 5 | Twin: Lifeline | done | kano-50 seed 2026: life-critical 0 min dark, essential 0 min, 0 L diesel, 109.9 kWh grid, ₦23,017/day. Fuzz-checked energy balance. |
-| 6 | Twin: baseline, comparison, event copy | todo | |
+| 6 | Twin: baseline, comparison, event copy | done | kano-50 seed 2026: today 315 min life-critical dark, 50 L, ₦179K/day; Lifeline 0 min, 0 L, ₦23K. Baseline runway divides fuel by the whole load (it never sheds). |
 | 7 | Finance and formatters | todo | |
 | 8 | App shell, state, router, tokens | todo | |
 | 9 | Shared components | todo | |

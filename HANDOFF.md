@@ -6,20 +6,27 @@ Use this file to resume after compaction or a session limit. **Update it after e
 
 ## Status
 
-- **Last updated:** 2026-10-30, at the end of planning.
-- **Phase:** Planning is complete and no code exists yet. The next step is PLAN.md Task 1 (scaffold).
-- **Repo:** local `C:\Shivansh\Projects\Global-Energy-Hackathon`. Remote: GitHub `lucifer-135/LifeLine` (private), branch `main`. Build runs as a subagent-driven cloud session.
+- **Last updated:** 2026-10-30, Task 1 complete (cloud build session, subagent-driven).
+- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: Task 2 (engine types, data tables, validation).
+- **Repo:** GitHub `lucifer-135/LifeLine` (private). Work branch `claude/modest-gauss-c677cd`, draft PR to `main`. Original local clone: `C:\Shivansh\Projects\Global-Energy-Hackathon`.
 - **Files present:**
   - `CLAUDE.md`
   - `PLAN.md`, `DESIGN.md`, `HANDOFF.md` (tracked in git so cloud sessions can read them)
-  - `docs/superpowers/specs/2026-10-30-lifeline-design.md` (approved spec)
-  - `example ps.jpeg` (screenshot of the hackathon tracks)
-- **Deployed URL:** none yet. Add it here after Task 1, step 7.
-- **Environment:**
+  - Vite react-ts app scaffold (Task 1)
+  - **Missing:** `docs/superpowers/specs/2026-10-30-lifeline-design.md` is not in the repo (not tracked, not on `main`). The cloud build treats PLAN.md + DESIGN.md + HANDOFF.md as the authority. Please commit the spec if it should be the tie-breaker.
+  - `example ps.jpeg` is local only (git-ignored).
+- **Deployed URL:** none yet. Needs the user (see "Needs user").
+- **Toolchain in the cloud build:** Node v22.22, npm 10.9. Installed: vite 8.3.5, react 19.3.1, typescript 7.0.2, vitest 5.0.5, recharts 3.10.1, motion 14.8.0, lucide-react 1.65.0.
+- **Lint:** the current create-vite react-ts template ships **oxlint** (`npm run lint` = `oxlint`), not ESLint. We kept the template default rather than add ESLint as a new dependency.
+- **Original environment (local):**
   - Windows 11
   - Node v24.12.0, npm 11.6.2
   - Python 3.14 with pypdf and PyMuPDF
   - `pdftotext` available in Git Bash
+
+### Needs user
+
+- **Vercel deploy (PLAN Task 1 Step 7, every "redeploy" step, Task 15 Step 5).** Claude cannot log in. Run `npx vercel` once to log in and link the project, then `npx vercel --prod`. Record the URL here.
 
 ### Task tracker
 
@@ -27,7 +34,7 @@ Keep this in sync with PLAN.md.
 
 | # | Task | Status | Notes |
 |---|---|---|---|
-| 1 | Scaffold, git, test runner, deploy | todo | Vercel login needs the user |
+| 1 | Scaffold, git, test runner, deploy | done | Vercel deploy skipped: needs the user. oxlint is the template linter. |
 | 2 | Engine types, data, validation | todo | |
 | 3 | Loads, solar shape, grid pattern | todo | |
 | 4 | Sizing | todo | |

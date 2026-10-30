@@ -174,6 +174,25 @@ describe('nav', () => {
 
     expect(menu).toHaveAttribute('aria-expanded', 'false')
     expect(await pageHeading('Plan & finance')).toBeInTheDocument()
+    // The route changed, so focus goes to the new page, not back to the Menu button.
+    await waitFor(() => expect(screen.getByRole('main')).toHaveFocus())
+  })
+
+  // No route change means nothing moves focus to <main>, and the link vanishes with the
+  // panel, so focus would drop to <body>.
+  test('picking the page you are on closes the menu and returns focus to the Menu button', async () => {
+    renderAt('#/plan')
+    await pageHeading('Plan & finance')
+
+    const menu = screen.getByRole('button', { name: 'Menu' })
+    fireEvent.click(menu)
+    const current = screen.getByRole('link', { name: 'Plan & finance' })
+    current.focus()
+    fireEvent.click(current)
+
+    expect(menu).toHaveAttribute('aria-expanded', 'false')
+    expect(menu).toHaveFocus()
+    expect(window.location.hash).toBe('#/plan')
   })
 })
 

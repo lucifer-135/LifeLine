@@ -1,5 +1,5 @@
 import { Menu } from 'lucide-react'
-import { useId, useState } from 'react'
+import { useId, useRef, useState } from 'react'
 import { routeHash, useHashRoute } from '../state/useHashRoute'
 import type { Route } from '../state/useHashRoute'
 import './Nav.css'
@@ -27,7 +27,16 @@ export function Nav() {
   const { route } = useHashRoute()
   const [menuOpen, setMenuOpen] = useState(false)
   const panelId = useId()
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
   const closeMenu = () => setMenuOpen(false)
+
+  // A link to another page changes the route, and the app moves focus to <main>. A link
+  // to the page you are on changes nothing, and the link hides with the panel, so focus
+  // would drop to <body>. Keep it on the Menu button instead.
+  const pickLink = (linkRoute: Route) => {
+    if (menuOpen && linkRoute === route) menuButtonRef.current?.focus()
+    closeMenu()
+  }
 
   return (
     <header className="nav">
@@ -37,6 +46,7 @@ export function Nav() {
           <span>Lifeline</span>
         </a>
         <button
+          ref={menuButtonRef}
           type="button"
           className="button button--secondary nav__menu-button"
           aria-expanded={menuOpen}
@@ -53,7 +63,7 @@ export function Nav() {
                 className="nav__link"
                 href={routeHash(link.route)}
                 aria-current={route === link.route ? 'page' : undefined}
-                onClick={closeMenu}
+                onClick={() => pickLink(link.route)}
               >
                 {link.label}
               </a>

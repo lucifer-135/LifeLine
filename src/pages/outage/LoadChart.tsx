@@ -33,7 +33,9 @@ const X_TICKS = [0, 16, 32, 48, 64, 80]
 // plot area using the same numbers (LoadChart.css reads them as --axis-left/--axis-right).
 const AXIS_WIDTH = 44
 const CHART_MARGIN = { top: 8, right: 0, bottom: 0, left: 0 }
-const TICK_STYLE = { fill: 'var(--text-faint)', fontSize: 12 }
+// --text-faint is only 4.4:1 on the --night-800 panel, under the 4.5:1 minimum for text,
+// so the ticks use --text-muted (7.4:1).
+const TICK_STYLE = { fill: 'var(--text-muted)', fontSize: 12 }
 
 const formatKw = (value: number) => `${value.toFixed(1)} kW`
 const formatPercent = (value: number) => `${value.toFixed(1)}%`

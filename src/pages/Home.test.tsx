@@ -119,6 +119,18 @@ describe('Home', () => {
     expect(within(statStrip()).getAllByRole('link')).toHaveLength(3)
   })
 
+  // Safari drops the list role from a list styled with `list-style: none` unless the
+  // role is set explicitly, so VoiceOver would not announce "list, 3 items".
+  test('the stat strip and the steps keep their list role', () => {
+    renderHome()
+    expect(statStrip()).toHaveAttribute('role', 'list')
+
+    const steps = within(screen.getByRole('region', { name: 'How it works' })).getByRole('list')
+    expect(steps.tagName).toBe('OL')
+    expect(steps).toHaveAttribute('role', 'list')
+    expect(within(steps).getAllByRole('listitem')).toHaveLength(3)
+  })
+
   test('the Kano sentence is sourced and stays outside the stat strip', () => {
     renderHome()
     const kano = screen.getByText(KANO_SENTENCE)

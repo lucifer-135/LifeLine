@@ -1,5 +1,6 @@
 import { Plus, Trash2 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
 import { Card } from '../components/Card'
 import { NumberField } from '../components/NumberField'
 import { SegmentedControl } from '../components/SegmentedControl'
@@ -48,6 +49,7 @@ const FIELD_IDS = {
 type ItemField = 'watts' | 'duty' | 'qty'
 
 const itemFieldId = (itemId: string, field: ItemField) => `profile-${itemId}-${field}`
+const removeButtonId = (itemId: string) => `profile-${itemId}-remove`
 
 // Profile-level messages from validateProfile, matched by the start of the text.
 const PROFILE_ERROR_FIELDS: [startsWith: string, fieldId: string][] = [
@@ -142,15 +144,16 @@ interface EquipmentRowProps {
 function EquipmentRow({ item, onChange, onRemove }: EquipmentRowProps) {
   // The column headers label these fields on a wide screen. When rows stack
   // they have no header above them, so each cell shows its own visible label.
+  // The explicit roles are for the stacked layout: see the table in Profile.
   return (
-    <tr className="equipment-row">
-      <th scope="row" className="equipment-row__name">
+    <tr className="equipment-row" role="row">
+      <th scope="row" role="rowheader" className="equipment-row__name">
         {item.name}
       </th>
-      <td className="equipment-row__priority">
+      <td role="cell" className="equipment-row__priority">
         <TierBadge tier={item.tier} />
       </td>
-      <td id={itemFieldId(item.id, 'watts')} className="equipment-row__field">
+      <td id={itemFieldId(item.id, 'watts')} role="cell" className="equipment-row__field">
         <span className="equipment-row__label" aria-hidden="true">
           Watts
         </span>
@@ -163,7 +166,7 @@ function EquipmentRow({ item, onChange, onRemove }: EquipmentRowProps) {
           onChange={(ratedW) => onChange({ ratedW })}
         />
       </td>
-      <td id={itemFieldId(item.id, 'duty')} className="equipment-row__field">
+      <td id={itemFieldId(item.id, 'duty')} role="cell" className="equipment-row__field">
         <span className="equipment-row__label" aria-hidden="true">
           Duty
         </span>
@@ -178,7 +181,7 @@ function EquipmentRow({ item, onChange, onRemove }: EquipmentRowProps) {
           onChange={(percent) => onChange({ dutyCycle: percent / 100 })}
         />
       </td>
-      <td id={itemFieldId(item.id, 'qty')} className="equipment-row__field">
+      <td id={itemFieldId(item.id, 'qty')} role="cell" className="equipment-row__field">
         <span className="equipment-row__label" aria-hidden="true">
           Qty
         </span>
@@ -192,8 +195,9 @@ function EquipmentRow({ item, onChange, onRemove }: EquipmentRowProps) {
           onChange={(qty) => onChange({ qty })}
         />
       </td>
-      <td className="equipment-row__remove">
+      <td role="cell" className="equipment-row__remove">
         <button
+          id={removeButtonId(item.id)}
           type="button"
           className="button button--secondary"
           aria-label={`Remove ${item.name}`}
@@ -248,6 +252,17 @@ export function Profile() {
         id: nextEquipmentId(template.name, profile.equipment),
       },
     })
+  }
+
+  // The removed row held focus. Move it to the next row's Remove, else the previous
+  // row's, else the add control, so it does not drop to <body>. flushSync renders the
+  // removal first, so the target is in its final place when it takes focus.
+  function removeEquipment(itemId: string) {
+    const rows = groups.flatMap((group) => group.items)
+    const index = rows.findIndex((row) => row.id === itemId)
+    const neighbour = rows[index + 1] ?? rows[index - 1]
+    flushSync(() => dispatch({ type: 'removeEquipment', id: itemId }))
+    document.getElementById(neighbour ? removeButtonId(neighbour.id) : FIELD_IDS.addEquipment)?.focus()
   }
 
   function chooseState(name: string) {
@@ -356,26 +371,28 @@ export function Profile() {
           </div>
 
           {hasEquipment ? (
-            <table className="equipment-table">
+            // Below 768px the rows are restyled as blocks (Profile.css), and Safari then
+            // drops the table semantics. The explicit roles keep them.
+            <table className="equipment-table" role="table">
               <caption className="visually-hidden">
                 Equipment by ward, with priority, power in watts, share of time in use and quantity
               </caption>
-              <thead>
-                <tr>
-                  <th scope="col">Item</th>
-                  <th scope="col">Priority</th>
-                  <th scope="col">Watts</th>
-                  <th scope="col">Duty</th>
-                  <th scope="col">Qty</th>
-                  <th scope="col">
+              <thead role="rowgroup">
+                <tr role="row">
+                  <th scope="col" role="columnheader">Item</th>
+                  <th scope="col" role="columnheader">Priority</th>
+                  <th scope="col" role="columnheader">Watts</th>
+                  <th scope="col" role="columnheader">Duty</th>
+                  <th scope="col" role="columnheader">Qty</th>
+                  <th scope="col" role="columnheader">
                     <span className="visually-hidden">Remove</span>
                   </th>
                 </tr>
               </thead>
               {groups.map((group) => (
-                <tbody key={group.ward}>
-                  <tr className="equipment-table__ward-row">
-                    <th scope="rowgroup" colSpan={6}>
+                <tbody key={group.ward} role="rowgroup">
+                  <tr className="equipment-table__ward-row" role="row">
+                    <th scope="rowgroup" role="rowheader" colSpan={6}>
                       {group.name}
                     </th>
                   </tr>
@@ -384,7 +401,7 @@ export function Profile() {
                       key={item.id}
                       item={item}
                       onChange={(patch) => dispatch({ type: 'updateEquipment', id: item.id, patch })}
-                      onRemove={() => dispatch({ type: 'removeEquipment', id: item.id })}
+                      onRemove={() => removeEquipment(item.id)}
                     />
                   ))}
                 </tbody>

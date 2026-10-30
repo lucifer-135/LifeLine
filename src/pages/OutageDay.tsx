@@ -95,7 +95,6 @@ function OutageTwin({ comparison }: { comparison: Comparison }) {
 
       <div className="outage__timeline">
         <LoadChart result={result} step={step} />
-        <PlaybackBar playback={playback} lastStep={LAST_STEP} />
       </div>
 
       <ComparisonPanel
@@ -105,6 +104,11 @@ function OutageTwin({ comparison }: { comparison: Comparison }) {
         dayEnded={step === LAST_STEP}
         costs={state.costs}
       />
+
+      {/* Last in the page so it stays docked at the bottom of the screen all the way down. */}
+      <div className="outage__dock">
+        <PlaybackBar playback={playback} lastStep={LAST_STEP} />
+      </div>
     </div>
   )
 }

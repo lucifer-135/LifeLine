@@ -1,6 +1,7 @@
 /* Outage day. Mobile first: one column in reading order (map, runway,
-   event log, chart, playback, comparison). From 768px the map sits on the left and the
-   runway and event log share the right column. */
+   event log, chart, comparison, playback). From 768px the map sits on the left and the
+   runway and event log share the right column. The playback bar is docked at the bottom
+   of the screen so play and the scrubber stay in reach while the person scrolls. */
 
 .outage {
   display: grid;
@@ -48,6 +49,27 @@
 .outage__timeline {
   display: grid;
   gap: var(--s-3);
+}
+
+/* The page background behind the bar hides what scrolls underneath it. */
+.outage__dock {
+  position: sticky;
+  bottom: 0;
+  z-index: var(--z-sticky);
+  padding-block: var(--s-3);
+  background: var(--night-900);
+}
+
+/* Controls keep clear of the dock when focus scrolls them into view. The bar wraps
+   to three rows on a phone, so the dock is taller there. */
+.outage :is(a, button, input, select, [tabindex]) {
+  scroll-margin-bottom: calc(12rem + var(--s-4));
+}
+
+@media (min-width: 768px) {
+  .outage :is(a, button, input, select, [tabindex]) {
+    scroll-margin-bottom: calc(7.5rem + var(--s-4));
+  }
 }
 
 @media (min-width: 768px) {

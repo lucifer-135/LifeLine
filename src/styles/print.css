@@ -11,9 +11,12 @@
   --paper-muted: color-mix(in srgb, var(--paper-text) 72%, var(--paper));
 }
 
+/* The margin lives on the proposal itself, not here. Print dialogs can override page
+   margins ("None", or browsers that ignore @page margins), which left the text touching the
+   paper edge. A zero page margin also stops the browser printing its URL and date header. */
 @page {
   size: A4;
-  margin: 16mm;
+  margin: 0;
 }
 
 .proposal {
@@ -36,11 +39,18 @@
     display: none !important;
   }
 
+  /* One A4 sheet: 18mm on every side, with the footer pushed to the foot of the page.
+     The height stays a little under 297mm so rounding never spills a blank second page. */
   .proposal {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    min-height: 296mm;
+    padding: 18mm 18mm 14mm;
     color: var(--paper-text);
     font-size: 10.5pt;
     line-height: 1.4;
+    box-decoration-break: clone;
   }
 
   .proposal p,
@@ -181,6 +191,9 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 4mm;
     margin: 0;
+    padding: 3mm 4mm;
+    border: 0.3mm solid var(--paper-rule);
+    border-radius: 2mm;
   }
 
   .proposal__figures--four {
@@ -214,8 +227,13 @@
     overflow-wrap: anywhere;
   }
 
+  /* Keeps a gap above the footer when the content fills the page. */
+  .proposal__block:last-of-type {
+    margin-bottom: 6mm;
+  }
+
   .proposal__footer {
-    margin-top: 6mm;
+    margin-top: auto;
     padding-top: 3mm;
     border-top: 0.3mm solid var(--paper-rule);
     color: var(--paper-muted);

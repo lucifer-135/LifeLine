@@ -6,8 +6,8 @@ Use this file to resume after compaction or a session limit. **Update it after e
 
 ## Status
 
-- **Last updated:** 2026-10-30, Task 12 complete; Tasks 13–14 in review/progress (cloud build session, subagent-driven).
-- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: Task 13 review, Task 14 (Method page), then Task 15.
+- **Last updated:** 2026-10-30, Task 13 complete; Task 14 in progress (cloud build session, subagent-driven).
+- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: Task 14 (Method page), then Task 15.
 - **Repo:** GitHub `lucifer-135/LifeLine` (private). Work branch `claude/modest-gauss-c677cd`, draft PR to `main`. Original local clone: `C:\Shivansh\Projects\Global-Energy-Hackathon`.
 - **Files present:**
   - `CLAUDE.md`
@@ -48,7 +48,7 @@ Keep this in sync with PLAN.md.
 | 10 | Home | done | Browser-checked at 375–1440 px with headless Chromium, including reduced motion. Hero scene in `src/pages/HeroScene.tsx`. Redeploy needs the user. |
 | 11 | Hospital profile | done | Browser-checked 320–1440 px; sticky summary never covers a focused field. Re-picking the selected preset reloads it (discards edits). |
 | 12 | Outage day | done | Browser-checked: 16× median step 25.5 ms; no timer leaks on leave/return; no NaN/tier codes in the DOM; room labels follow cause (Paused = Lifeline shed, No power = unserved). Bundle 825 kB (Recharts) — build warning only. |
-| 13 | Plan & finance, proposal | todo | |
+| 13 | Plan & finance, proposal | done | Proposal prints to exactly 1 A4 page (checked with headless Chromium PDF). Cost errors stay fixable on the Plan page. |
 | 14 | Method & sources | todo | |
 | 15 | Polish, a11y, README, deploy | todo | |
 | — | Demo video and submission | todo | not code |
@@ -198,7 +198,7 @@ Do not cite the Kano hospital's system size: one source says a 7 MW solar projec
 
 - **Controller sheds on battery charge only (HANDOFF decision 5).** On some seeds (1–20) Lifeline pauses essential loads for up to 405 min/day while using under 3 L of the 50 L/day diesel. The demo seed 2026 sheds nothing. If judges try "New day", the essential-load comparison can favour the diesel-only baseline. A possible change: let diesel cover essential load before shedding it. That needs a decision and test updates.
 
-- **Fonts.** If "Atkinson Hyperlegible Next" is not on Google Fonts, fall back to "Atkinson Hyperlegible" (DESIGN.md §3).
+- **Fonts.** Resolved: "Atkinson Hyperlegible Next" is on Google Fonts (CSS request returns 200, checked 2026-10-30).
 - **Judging criteria are unknown.** The design covers the likely axes: impact, feasibility, innovation, the demo, business model and scalability.
 - **Provider return looks very rich.** At ₦3,277/L the kano-50 case pays back in 1.0 years with a 103% IRR. Judges may question it; the diesel price sensitivity below is the answer.
 - **Diesel price spike.** The finance case is very strong at ₦3,277/L, and judges may question it. Show it as editable, and mention the February price of ₦1,420 as a sensitivity case.

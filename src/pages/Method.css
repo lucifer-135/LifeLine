@@ -1,0 +1,197 @@
+/* Method & sources (DESIGN §6.4): one readable column. The formulas are
+   indented blocks in the body face; the source table stacks below 768px. */
+
+.method {
+  padding-block: var(--s-6) var(--s-8);
+}
+
+.method__column {
+  display: grid;
+  gap: var(--s-7);
+  max-width: 68ch;
+}
+
+.method__column > * {
+  min-width: 0;
+}
+
+.method__intro,
+.method-section {
+  display: grid;
+  gap: var(--s-4);
+}
+
+.method__intro {
+  gap: var(--s-3);
+}
+
+.method-section h3 {
+  margin-top: var(--s-2);
+}
+
+/* Formulas */
+
+.method-formula {
+  margin-inline-start: var(--s-4);
+  padding-inline-start: var(--s-4);
+  border-inline-start: 2px solid var(--line-strong);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.method-formula__name {
+  font-weight: 700;
+}
+
+.method-list {
+  display: grid;
+  gap: var(--s-3);
+  padding-inline-start: var(--s-5);
+}
+
+/* Sources table */
+
+.sources-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+}
+
+.sources-table caption {
+  padding-bottom: var(--s-3);
+  text-align: left;
+}
+
+.sources-table th,
+.sources-table td {
+  padding: var(--s-2) var(--s-3);
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.sources-table thead th {
+  background: var(--night-700);
+  font-weight: 700;
+}
+
+.sources-table .source-row__value {
+  --index-width: 3ch;
+  position: relative;
+  padding-inline-start: calc(var(--s-3) + var(--index-width));
+  font-weight: 500;
+}
+
+/* The number matches the superscript mark that links here. It hangs in the margin
+   so a label that wraps lines up under the label, not under the number. */
+.source-row__index {
+  position: absolute;
+  inset-inline-start: var(--s-3);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* A figure never breaks mid-number; its unit may wrap at a space. */
+.sources-table .sources-table__number-head,
+.sources-table .source-row__number {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: normal;
+}
+
+.source-row__date {
+  display: block;
+  color: var(--text-muted);
+}
+
+.source-tag {
+  display: inline-block;
+  padding: var(--s-1) var(--s-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  font-size: var(--fs-sm);
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+/* The row a source mark linked to. Colour never carries it alone: the page also
+   scrolls to the row. Outline only, so nothing moves. */
+.source-row--target {
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+  animation: source-flash 1.2s ease-out 1;
+}
+
+@keyframes source-flash {
+  0%,
+  50% {
+    outline-color: var(--lamp);
+  }
+  100% {
+    outline-color: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .source-row--target {
+    animation: none;
+  }
+}
+
+/* Below 768px each source is a block: the label with its Estimate tag on the
+   first line, then the number, then the source. The header row is still read by
+   assistive tech. */
+@media (max-width: 767.98px) {
+  .sources-table,
+  .sources-table tbody {
+    display: block;
+  }
+
+  .sources-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .sources-table .source-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--s-1) var(--s-3);
+    padding: var(--s-3) var(--s-2);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .sources-table th,
+  .sources-table td {
+    padding: 0;
+    border-bottom: 0;
+  }
+
+  .sources-table .source-row__value {
+    grid-column: 1;
+    grid-row: 1;
+    padding-inline-start: var(--index-width);
+  }
+
+  .source-row__index {
+    inset-inline-start: 0;
+  }
+
+  .sources-table .source-row__estimate {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .sources-table .source-row__number,
+  .sources-table .source-row__source {
+    grid-column: 1 / -1;
+    text-align: left;
+  }
+
+  .sources-table .source-row__estimate:empty {
+    display: none;
+  }
+}

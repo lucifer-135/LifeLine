@@ -1,0 +1,91 @@
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-nav);
+  background: var(--night-950);
+  border-bottom: 1px solid var(--line);
+}
+
+/* Mobile first: brand and Menu button on one row, the links panel below. */
+.nav__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--nav-h);
+  padding-block: var(--s-1);
+}
+
+.nav__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: 44px;
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  font-weight: 700;
+  font-stretch: 100%;
+  color: var(--text);
+  text-decoration: none;
+}
+
+/* The mark is a lit window, so its panes use the lamp colour and glow. */
+.nav__mark {
+  flex: none;
+  filter: drop-shadow(0 0 4px var(--lamp-glow));
+}
+
+.nav__mark rect {
+  fill: var(--lamp);
+}
+
+.nav__links {
+  display: none;
+  flex-basis: 100%;
+  flex-direction: column;
+  margin: 0;
+  padding: 0 0 var(--s-3);
+  list-style: none;
+}
+
+.nav__links[data-open='true'] {
+  display: flex;
+}
+
+.nav__link {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.nav__link:hover {
+  color: var(--text);
+}
+
+/* The lit link: brighter text with a 2px lamp underline. */
+.nav__link[aria-current='page'] {
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--lamp);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 8px;
+}
+
+@media (min-width: 768px) {
+  .nav__menu-button {
+    display: none;
+  }
+
+  .nav__links {
+    display: flex;
+    flex-basis: auto;
+    flex-direction: row;
+    gap: var(--s-5);
+    padding: 0;
+  }
+}

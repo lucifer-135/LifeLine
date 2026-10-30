@@ -1,0 +1,54 @@
+:root {
+  /* Night: surfaces */
+  --night-950: #0A1026;   /* page background */
+  --night-900: #0E1530;   /* app background */
+  --night-800: #17204A;   /* panels */
+  --night-700: #212C5E;   /* raised controls, table header */
+  --line:      #2E3A72;   /* hairlines, walls in floor plan */
+  --line-strong:#4A5799;
+
+  /* Text */
+  --text:       #EEF1FF;  /* 15.6:1 on night-900 */
+  --text-muted: #A9B1D6;  /* 8.1:1 */
+  --text-faint: #7C86B8;  /* 4.7:1 — captions only, ≥14px */
+
+  /* Meaning colours */
+  --lamp:      #FFB547;   /* powered / primary action — 10.3:1 */
+  --lamp-glow: rgba(255, 181, 71, 0.35);
+  --t1:        #FFB547;   /* Life-critical served (full lamp) */
+  --t2:        #C98A3A;   /* Essential served (dimmer lamp) */
+  --t3:        #8A6A45;   /* Can wait served (dimmest; chart adds hatch) */
+  --solar:     #FFF1C2;   /* PV line, pale sun */
+  --battery:   #3FD0C9;   /* SoC line, battery room fill */
+  --grid:      #6EA8FF;   /* grid-on strip, power line */
+  --diesel:    #9AA0B5;   /* generator, baseline scenario */
+  --warn:      #FF9F43;   /* runway < 2h */
+  --alarm:     #FF4D5E;   /* life-critical without power — only use */
+  --ok:        #7BD88F;   /* verdict tick only */
+
+  /* Type */
+  --font-display: "Archivo", system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif;
+  --fs-xs: 12px; --fs-sm: 14px; --fs-base: 16px; --fs-md: 18px; --fs-lg: 21px;
+  --fs-xl: 24px; --fs-2xl: 36px; --fs-3xl: 48px; --fs-display: clamp(44px, 7.2vw, 88px);
+  --lh-body: 1.55; --lh-tight: 1.05;
+
+  /* Space (4-pt) */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px; --s-9: 96px;
+
+  /* Radius by hierarchy: controls < panels; pills only for segmented controls/badges */
+  --r-control: 6px; --r-panel: 14px; --r-pill: 999px;
+
+  /* Motion */
+  --dur-press: 100ms; --dur-fast: 180ms; --dur-base: 280ms; --dur-count: 900ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+
+  /* Layers */
+  --z-base: 0; --z-sticky: 20; --z-nav: 40; --z-toast: 100;
+
+  /* Layout */
+  --content-max: 1200px; --gutter: 16px;
+}
+@media (min-width: 768px)  { :root { --gutter: 24px; } }
+@media (min-width: 1024px) { :root { --gutter: 40px; } }

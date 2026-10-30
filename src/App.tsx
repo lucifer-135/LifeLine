@@ -1,121 +1,79 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { MotionConfig } from 'motion/react'
+import { useEffect, useRef } from 'react'
+import type { ComponentType, MouseEvent } from 'react'
+import { Nav } from './components/Nav'
+import { PageTransition } from './components/PageTransition'
+import { Home } from './pages/Home'
+import { Method } from './pages/Method'
+import { OutageDay } from './pages/OutageDay'
+import { Plan } from './pages/Plan'
+import { Profile } from './pages/Profile'
+import { scrollToAnchor, useHashRoute } from './state/useHashRoute'
+import type { Route } from './state/useHashRoute'
+
+const PAGES: Record<Route, ComponentType> = {
+  home: Home,
+  profile: Profile,
+  outage: OutageDay,
+  plan: Plan,
+  method: Method,
+}
+
+const PAGE_TITLES: Record<Route, string> = {
+  home: 'Lifeline — Hospital Power Continuity',
+  profile: 'Hospital profile — Lifeline',
+  outage: 'Outage day — Lifeline',
+  plan: 'Plan & finance — Lifeline',
+  method: 'Method — Lifeline',
+}
+
+// Mounts together with its page, so the anchor element exists when we scroll.
+// The route change is animated: the page mounts only after the old one has left,
+// so scrolling from the hook itself would run too early.
+function RoutedPage({ route, anchor }: { route: Route; anchor: string | null }) {
+  useEffect(() => {
+    scrollToAnchor(anchor)
+  }, [anchor])
+  const Page = PAGES[route]
+  return <Page />
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { route, anchor } = useHashRoute()
+  const mainRef = useRef<HTMLElement>(null)
+  const previousRoute = useRef(route)
+
+  useEffect(() => {
+    document.title = PAGE_TITLES[route]
+  }, [route])
+
+  // Move focus to <main> on a route change, not on first load. Comparing with the
+  // previous route (rather than a "first run" flag) keeps StrictMode's repeated
+  // effect run from stealing focus at startup.
+  useEffect(() => {
+    if (previousRoute.current === route) return
+    previousRoute.current = route
+    mainRef.current?.focus()
+  }, [route])
+
+  // The skip link must not touch the hash, because the hash is the route.
+  const skipToContent = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault()
+    mainRef.current?.focus()
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    <MotionConfig reducedMotion="user">
+      <a className="skip-link" href="#main" onClick={skipToContent}>
+        Skip to content
+      </a>
+      <Nav />
+      <main id="main" ref={mainRef} tabIndex={-1}>
+        <PageTransition routeKey={route}>
+          <RoutedPage route={route} anchor={anchor} />
+        </PageTransition>
+      </main>
+    </MotionConfig>
   )
 }
 

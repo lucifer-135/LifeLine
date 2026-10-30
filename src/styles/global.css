@@ -1,0 +1,316 @@
+/* Global styles: reset, base type (DESIGN §3), layout, buttons (DESIGN §7),
+   focus, and the CSS motion loops (DESIGN §4). Colours, sizes and spacing come
+   from tokens.css; component styles live next to their components. */
+
+/* Height of the sticky nav, used for scroll-margin-top so it never covers a
+   focused control or an anchor target. */
+:root {
+  --nav-h: 56px;
+}
+
+/* Reset */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+  background: var(--night-950);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body,
+h1,
+h2,
+h3,
+p,
+ul,
+ol,
+figure {
+  margin: 0;
+}
+
+body {
+  min-height: 100dvh;
+  background: var(--night-900);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  font-weight: 400;
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--text);
+  text-decoration-color: var(--text-faint);
+  text-underline-offset: 3px;
+}
+
+main {
+  display: block;
+}
+
+/* Base type */
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-size: var(--fs-3xl);
+  font-weight: 760;
+  font-stretch: 106%;
+  line-height: var(--lh-tight);
+}
+
+h2 {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  font-stretch: 100%;
+  line-height: 1.15;
+}
+
+h3 {
+  font-family: var(--font-body);
+  font-size: var(--fs-md);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+p {
+  max-width: 68ch;
+}
+
+/* The home page h1 only. */
+.display {
+  font-size: var(--fs-display);
+  font-weight: 820;
+  font-stretch: 112%;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.caption {
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+/* Live numbers read like a patient monitor: condensed, heavy, fixed-width digits. */
+.live-number {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-stretch: 75%;
+  font-variant-numeric: tabular-nums;
+}
+
+.live-number--runway {
+  font-size: 64px;
+}
+
+.live-number--comparison {
+  font-size: var(--fs-2xl);
+}
+
+.live-number--clock {
+  font-size: var(--fs-lg);
+}
+
+/* Table figures */
+.figure {
+  font-size: var(--fs-sm);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* Layout */
+
+.container {
+  width: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus */
+
+:focus-visible {
+  outline: 2px solid var(--lamp);
+  outline-offset: 3px;
+}
+
+/* <main> takes focus only from code (skip link, route change). It is not a
+   control, and a ring around the whole page would be noise. */
+main:focus-visible {
+  outline: none;
+}
+
+/* Keep anything we scroll or focus clear of the sticky nav. */
+[id],
+a,
+button,
+input,
+select,
+textarea,
+summary,
+[tabindex] {
+  scroll-margin-top: calc(var(--nav-h) + var(--s-4));
+}
+
+.skip-link {
+  position: fixed;
+  top: var(--s-2);
+  left: var(--s-2);
+  z-index: var(--z-toast);
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-control);
+  background: var(--lamp);
+  color: var(--night-950);
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+/* Icons: one stroke weight across the app (DESIGN §7). */
+svg.lucide {
+  stroke-width: 1.75;
+}
+
+/* Buttons: primary is the lamp fill (the action that turns the lights on),
+   secondary is an outline. */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  min-height: 44px;
+  padding: var(--s-2) var(--s-4);
+  border: 1px solid transparent;
+  border-radius: var(--r-control);
+  font-size: var(--fs-base);
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
+}
+
+.button--primary {
+  background: var(--lamp);
+  color: var(--night-950);
+}
+
+.button--secondary {
+  background: transparent;
+  border-color: var(--line-strong);
+  color: var(--text);
+}
+
+/* Hover lightens by 6%. Only the primary button also glows. */
+.button--primary:not(:disabled):hover {
+  background: color-mix(in srgb, var(--lamp) 94%, white);
+  box-shadow: 0 0 24px var(--lamp-glow);
+}
+
+.button--secondary:not(:disabled):hover {
+  background: color-mix(in srgb, white 6%, transparent);
+}
+
+.button:not(:disabled):active {
+  transform: scale(0.97);
+}
+
+.button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Motion loops (DESIGN §4). Everything else is animated with `motion`. */
+
+/* A room whose life-critical equipment has no power: outline opacity 1 to 0.35
+   and back, one cycle every 1.2s. */
+@keyframes alarm-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* Power lines: dashes travel along the path, one cycle every 1.6s. The offset
+   is one dash period, so the loop is seamless. Add --reverse when energy runs
+   against the path direction. */
+@keyframes power-flow {
+  to {
+    stroke-dashoffset: -12;
+  }
+}
+
+.alarm-pulse {
+  animation: alarm-pulse 1.2s ease-in-out infinite;
+}
+
+.power-flow {
+  stroke-dasharray: 6 6;
+  animation: power-flow 1.6s linear infinite;
+}
+
+.power-flow--reverse {
+  animation-direction: reverse;
+}
+
+/* Reduced motion: no pulsing (the alarm keeps its static outline plus the
+   "No power" text), and power lines stay as static dashes. */
+@media (prefers-reduced-motion: reduce) {
+  .alarm-pulse,
+  .power-flow {
+    animation: none;
+  }
+}

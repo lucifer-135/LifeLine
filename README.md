@@ -22,7 +22,7 @@ Five screens:
 2. **Hospital profile.** Start from a preset (General Hospital, Kano, 50 beds, or Primary Health Centre, FCT) or list your own equipment by ward. Set the state, beds, grid hours a day, diesel per month and generator size.
 3. **Outage day.** A living floor plan of the hospital through 24 hours in 15-minute steps. Rooms light up, dim or show "No power" as the grid comes and goes. Alongside it: how long the ICU is covered for, an event log, a load chart, and a side-by-side comparison of "Today: diesel only" against "With Lifeline", ending in a verdict.
 4. **Plan & finance.** Solar, battery and inverter sizes; the monthly fee against today's energy spend; upfront cost, payback, return and CO₂ avoided for the investor; every price assumption editable; and a one-page proposal to download.
-5. **Method & sources.** The formulas, every default number with its source, and the model's limits.
+5. **Method & sources.** The formulas, every sourced default value with its source and date, the model settings explained, and the model's limits.
 
 ### Demo path
 
@@ -64,7 +64,7 @@ The Method page in the app has the full detail and the formulas.
 
 - With the grid up, everything is served, and the battery charges from spare solar first, then from the grid.
 - In an outage, the controller looks ahead to the next time the grid returns or the sun is strong (08:00–16:00), and compares the energy the loads need until then with the battery energy above a 20% reserve.
-- If the battery cannot carry everything, it pauses loads that can wait first, then essential loads, and brings them back only with a 20% margin. Life-critical load is never paused.
+- Loads that can wait are paused first, whenever the battery alone cannot carry everything. Before pausing essential loads, the controller also counts the diesel the generator can supply until the grid returns or the sun is strong. Paused loads come back only with a 20% margin. Life-critical load is never paused.
 - Power comes from solar first, then the battery down to its reserve, then the generator, and last the battery's reserve.
 - "Today: diesel only" starts each outage with a 15-minute gap while the generator is started by hand. The generator then serves life-critical load first until the fuel runs out.
 
@@ -77,7 +77,7 @@ The Method page in the app has the full detail and the formulas.
 
 ## Sources
 
-Every default number in the app has a source. Open **Method & sources** in the app to see each one, its date, and whether it is an estimate. The key sources:
+Every sourced default value in the app has a source and a date. Open **Method & sources** in the app to see each one and whether it is an estimate. The model settings (0.8 usable, 0.9 round trip, 0.75 performance ratio, 1.25 headroom and the 20% battery reserve) are not sourced values; the Method page explains them. The key sources:
 
 - Diesel price, ₦3,277 per litre: NBS Diesel Price Watch, May 2026 average retail, reported by [Legit.ng](https://www.legit.ng/business-economy/energy/1716140-nbs-diesel-price-rises-8640-n3277litre-2026/).
 - Grid tariff, ₦209.5 per kWh: NERC Band A tariff, [Leadership](https://leadership.ng/?p=484864).

@@ -178,30 +178,51 @@ function energyNeeded(ctx: TwinContext, s: number, relief: number, tiers: Tier[]
   return needKwh
 }
 
-// Sheds on battery energy alone: diesel is held back for emergencies, so a load is
-// only kept on if the battery above its reserve can carry it until relief.
+// Steps from `s` up to relief: the window `energyNeeded` sums over.
+function stepsUntilRelief(s: number, relief: number): number {
+  return relief === s ? STEPS_PER_DAY : (relief - s + STEPS_PER_DAY) % STEPS_PER_DAY
+}
+
+// Diesel energy (kWh) the generator can still deliver before relief: capped by its
+// rating over the window and by the fuel left. A zero or negative fuel rate means free
+// running, as in `dieselLimitKw`.
+function dieselEnergyUntilRelief(input: TwinInput, fuelLeft: number, steps: number): number {
+  if (input.generatorKw <= 0) return 0
+  const ratingKwh = input.generatorKw * steps * STEP_HOURS
+  const litresPerKwh = input.costs.dieselLitresPerKwh
+  const fuelKwh = litresPerKwh > 0 ? fuelLeft / litresPerKwh : Infinity
+  return Math.max(0, Math.min(ratingKwh, fuelKwh))
+}
+
+// Loads that can wait are kept on only if the battery above its reserve can carry
+// everything until relief, so diesel is never burned for them. Essential loads (ward
+// lighting, refrigeration) also count the diesel the generator can deliver until
+// relief, so they are not paused while the generator could still carry them.
 function decideShedding(
   previous: Shedding,
   needAllKwh: number,
   needProtectedKwh: number,
-  availKwh: number,
+  batteryKwh: number,
+  batteryAndDieselKwh: number,
 ): Shedding {
-  let shedT3 = previous.shedT3 || needAllKwh > availKwh
-  let shedT2 = previous.shedT2 || needProtectedKwh > availKwh
-  if (shedT2 && needProtectedKwh < RESTORE_HYSTERESIS * availKwh) shedT2 = false
-  if (shedT3 && !shedT2 && needAllKwh < RESTORE_HYSTERESIS * availKwh) shedT3 = false
+  let shedT3 = previous.shedT3 || needAllKwh > batteryKwh
+  let shedT2 = previous.shedT2 || needProtectedKwh > batteryAndDieselKwh
+  if (shedT2 && needProtectedKwh < RESTORE_HYSTERESIS * batteryAndDieselKwh) shedT2 = false
+  if (shedT3 && !shedT2 && needAllKwh < RESTORE_HYSTERESIS * batteryKwh) shedT3 = false
   return { shedT2, shedT3 }
 }
 
 function outageShedding(ctx: TwinContext, s: number, start: StepStart): Shedding {
   const relief = findReliefStep(ctx.input.grid, s)
-  const availKwh =
+  const batteryKwh =
     Math.max(0, start.soc - BATTERY_RESERVE_SOC) * ctx.input.size.batteryKwh * BATTERY_ONE_WAY
+  const dieselKwh = dieselEnergyUntilRelief(ctx.input, start.fuelLeft, stepsUntilRelief(s, relief))
   return decideShedding(
     start,
     energyNeeded(ctx, s, relief, ALL_TIERS),
     energyNeeded(ctx, s, relief, PROTECTED_TIERS),
-    availKwh,
+    batteryKwh,
+    batteryKwh + dieselKwh,
   )
 }
 

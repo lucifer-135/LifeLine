@@ -1,0 +1,34 @@
+.tier-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-1) var(--s-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--night-900);
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.tier-badge__dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--tier-color);
+}
+
+.tier-badge--life-critical {
+  --tier-color: var(--t1);
+}
+
+.tier-badge--essential {
+  --tier-color: var(--t2);
+}
+
+.tier-badge--can-wait {
+  --tier-color: var(--t3);
+}

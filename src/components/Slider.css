@@ -1,0 +1,81 @@
+.slider {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+}
+
+.slider__label {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.slider__control {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+}
+
+/* The input itself is 44px tall, so the whole row is the hit area. The thumb
+   travels from 10px to (width - 10px), so the lamp fill is offset the same way
+   to end exactly under the thumb's centre. */
+.slider__input {
+  --thumb: 20px;
+  --track: 4px;
+  --fill-end: calc(var(--slider-fraction) * (100% - var(--thumb)) + var(--thumb) / 2);
+  --track-bg: linear-gradient(
+    to right,
+    var(--lamp) var(--fill-end),
+    var(--night-700) var(--fill-end)
+  );
+
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 44px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.slider__input::-webkit-slider-runnable-track {
+  height: var(--track);
+  border-radius: var(--r-pill);
+  background: var(--track-bg);
+}
+
+.slider__input::-moz-range-track {
+  height: var(--track);
+  border-radius: var(--r-pill);
+  background: var(--track-bg);
+}
+
+.slider__input::-webkit-slider-thumb {
+  width: var(--thumb);
+  height: var(--thumb);
+  margin-top: calc((var(--track) - var(--thumb)) / 2);
+  border: 2px solid var(--lamp);
+  border-radius: 50%;
+  background: var(--text);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.slider__input::-moz-range-thumb {
+  box-sizing: border-box;
+  width: var(--thumb);
+  height: var(--thumb);
+  border: 2px solid var(--lamp);
+  border-radius: 50%;
+  background: var(--text);
+}
+
+/* Fixed width so the track does not resize while the value changes. */
+.slider__value {
+  flex: none;
+  min-width: 4ch;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  text-align: right;
+}

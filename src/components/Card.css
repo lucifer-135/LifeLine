@@ -1,0 +1,13 @@
+/* Surfaces are separated by colour and a hairline, never by shadow. */
+.card--panel {
+  padding: var(--s-5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  background: var(--night-800);
+}
+
+.card--inset {
+  padding: var(--s-4);
+  border-radius: var(--r-control);
+  background: var(--night-900);
+}

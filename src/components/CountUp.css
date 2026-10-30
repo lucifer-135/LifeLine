@@ -1,0 +1,6 @@
+/* Fixed-width digits so the number does not jitter while it counts. The
+   relative position anchors the visually hidden twin next to the number. */
+.count-up {
+  position: relative;
+  font-variant-numeric: tabular-nums;
+}

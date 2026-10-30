@@ -1,0 +1,24 @@
+.source-ref {
+  /* Keep the superscript from stretching the line it sits in. */
+  line-height: 0;
+  font-size: var(--fs-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.source-ref a {
+  position: relative;
+  margin-inline: 1px;
+  color: var(--text-muted);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.source-ref a:hover {
+  color: var(--lamp);
+}
+
+/* The number is tiny, so widen the tap area without moving anything. */
+.source-ref a::after {
+  content: '';
+  position: absolute;
+  inset: -14px -10px;
+}

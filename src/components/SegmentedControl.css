@@ -1,0 +1,52 @@
+.segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--s-1);
+  padding: var(--s-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--night-900);
+}
+
+.segmented__option {
+  position: relative;
+  min-width: 44px;
+  min-height: 44px;
+  padding: var(--s-2) var(--s-4);
+  border: 0;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
+}
+
+.segmented__option:hover {
+  color: var(--text);
+}
+
+.segmented__option:active {
+  transform: scale(0.97);
+}
+
+/* The selected option is a raised fill with a lamp underline. The text colour
+   change and the underline both mark it, not just the fill. */
+.segmented__option[aria-checked='true'] {
+  background: var(--night-700);
+  color: var(--text);
+}
+
+.segmented__option[aria-checked='true']::after {
+  content: '';
+  position: absolute;
+  inset-inline: var(--s-4);
+  bottom: 6px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--lamp);
+}

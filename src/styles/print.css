@@ -1,0 +1,224 @@
+/* Print: the proposal (DESIGN §11). On screen the proposal is hidden. When the page is
+   printed, the app chrome and the plan page are hidden and only the proposal shows, as one A4
+   page of light paper colours. These literal colours are the only raw hex values allowed in
+   the app: paper is light whatever the screen theme is. */
+
+:root {
+  --paper: #ffffff;
+  --paper-text: #141a33;
+  --paper-rule: #c9cee6;
+  --paper-accent: #b26a00;
+  --paper-muted: color-mix(in srgb, var(--paper-text) 72%, var(--paper));
+}
+
+@page {
+  size: A4;
+  margin: 16mm;
+}
+
+.proposal {
+  display: none;
+}
+
+@media print {
+  html,
+  body {
+    min-height: 0;
+    background: var(--paper);
+    color: var(--paper-text);
+    color-scheme: light;
+  }
+
+  /* !important: hiding must win however the page's own styles are ordered. */
+  .skip-link,
+  .nav,
+  .plan {
+    display: none !important;
+  }
+
+  .proposal {
+    display: block;
+    color: var(--paper-text);
+    font-size: 10.5pt;
+    line-height: 1.4;
+  }
+
+  .proposal p,
+  .proposal ul {
+    max-width: none;
+    margin: 0;
+  }
+
+  /* Header: the mark, the date, then the title over an accent rule. */
+
+  .proposal__header {
+    display: grid;
+    gap: 3mm;
+    padding-bottom: 4mm;
+    border-bottom: 0.6mm solid var(--paper-accent);
+    break-inside: avoid;
+  }
+
+  .proposal__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .proposal__brand {
+    display: flex;
+    align-items: center;
+    gap: 2mm;
+    font-family: var(--font-display);
+    font-size: 12pt;
+    font-weight: 700;
+    font-stretch: 100%;
+  }
+
+  .proposal__mark rect {
+    fill: var(--paper-accent);
+  }
+
+  .proposal__date {
+    color: var(--paper-muted);
+  }
+
+  .proposal__title {
+    font-family: var(--font-display);
+    font-size: 21pt;
+    font-weight: 760;
+    font-stretch: 106%;
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+
+  /* The system: three columns. */
+
+  .proposal__system {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4mm;
+    margin: 6mm 0 0;
+    break-inside: avoid;
+  }
+
+  .proposal__system-item {
+    padding: 3mm 4mm;
+    border: 0.3mm solid var(--paper-rule);
+    border-radius: 2mm;
+  }
+
+  .proposal__system-item dt {
+    color: var(--paper-muted);
+  }
+
+  .proposal__system-item dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 23pt;
+    font-weight: 800;
+    font-stretch: 75%;
+    font-variant-numeric: tabular-nums;
+    color: var(--paper-accent);
+  }
+
+  /* Blocks: each stays whole on its page. */
+
+  .proposal__block {
+    margin-top: 6mm;
+    break-inside: avoid;
+  }
+
+  .proposal__block h3 {
+    margin: 0 0 1.5mm;
+    font-family: var(--font-display);
+    font-size: 12.5pt;
+    font-weight: 700;
+    font-stretch: 100%;
+    line-height: 1.2;
+  }
+
+  .proposal__note {
+    margin-bottom: 2mm;
+    color: var(--paper-muted);
+  }
+
+  .proposal__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .proposal__table th,
+  .proposal__table td {
+    padding: 2mm 2mm;
+    border-bottom: 0.3mm solid var(--paper-rule);
+    font-weight: 400;
+    text-align: right;
+  }
+
+  .proposal__table thead th {
+    font-weight: 700;
+    border-bottom-color: var(--paper-text);
+  }
+
+  .proposal__table th:first-child {
+    padding-left: 0;
+    text-align: left;
+  }
+
+  .proposal__table td:last-child,
+  .proposal__table thead th:last-child {
+    padding-right: 0;
+  }
+
+  .proposal__table tbody td:last-child {
+    font-weight: 700;
+  }
+
+  .proposal__figures {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4mm;
+    margin: 0;
+  }
+
+  .proposal__figures--four {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .proposal__figure dt {
+    color: var(--paper-muted);
+    font-size: 9.5pt;
+  }
+
+  .proposal__figure dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 17pt;
+    font-weight: 800;
+    font-stretch: 75%;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .proposal__method {
+    padding-left: 4.5mm;
+  }
+
+  .proposal__method li + li {
+    margin-top: 1mm;
+  }
+
+  .proposal__method-link {
+    margin-top: 2mm;
+    overflow-wrap: anywhere;
+  }
+
+  .proposal__footer {
+    margin-top: 6mm;
+    padding-top: 3mm;
+    border-top: 0.3mm solid var(--paper-rule);
+    color: var(--paper-muted);
+    font-size: 8.5pt;
+  }
+}

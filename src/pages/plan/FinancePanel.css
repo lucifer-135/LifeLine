@@ -1,0 +1,135 @@
+/* Who pays what (DESIGN §6.3): the hero saving, today's spend against the fee,
+   the fee slider, then the investor figures. */
+
+.finance {
+  display: grid;
+  gap: var(--s-5);
+}
+
+.finance-hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--s-2);
+  max-width: none;
+  font-size: var(--fs-md);
+}
+
+.finance-hero__number {
+  font-size: var(--fs-3xl);
+  line-height: var(--lh-tight);
+  color: var(--lamp);
+}
+
+.finance__caption {
+  margin-bottom: var(--s-2);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* Money bar: label and amount above a bar, one row per amount, on one scale. */
+
+.money-bar__rows {
+  display: grid;
+  gap: var(--s-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.money-bar__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--s-1) var(--s-3);
+}
+
+.money-bar__value {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.money-bar__track {
+  position: relative;
+  grid-column: 1 / -1;
+  height: 20px;
+  overflow: hidden;
+  border-radius: var(--r-control);
+  background: var(--night-700);
+}
+
+.money-bar__fill {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.money-bar__fill--today {
+  background: var(--diesel);
+}
+
+.money-bar__fill--fee {
+  background: var(--lamp);
+}
+
+/* A softer lamp tint, so the saving reads as the part of today's spend that is left over. */
+.money-bar__fill--gap {
+  background: color-mix(in srgb, var(--lamp) 24%, transparent);
+}
+
+.money-bar__saving {
+  margin-top: var(--s-3);
+  font-weight: 700;
+  color: var(--lamp);
+}
+
+/* Investor block */
+
+.finance-investor {
+  display: grid;
+  gap: var(--s-3);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--line);
+}
+
+.finance-investor__rows {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-4);
+  margin: 0;
+}
+
+/* Two by two: upfront cost and payback, then return and CO₂. */
+@media (min-width: 480px) {
+  .finance-investor__rows {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.finance-investor__item {
+  display: grid;
+  gap: var(--s-1);
+}
+
+.finance-investor__item dt {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+.finance-investor__item dd {
+  margin: 0;
+}
+
+.finance-investor__figure {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  font-stretch: 75%;
+  font-variant-numeric: tabular-nums;
+}
+
+.finance-investor__secondary {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}

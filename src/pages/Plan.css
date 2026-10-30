@@ -1,0 +1,72 @@
+/* Plan & finance (DESIGN §6.3). One column in reading order; from 1024px "What to
+   install" sits left of "Who pays what". */
+
+.plan {
+  display: grid;
+  gap: var(--s-6);
+  padding-block: var(--s-6) var(--s-7);
+}
+
+.plan--invalid {
+  justify-items: start;
+  gap: var(--s-4);
+}
+
+.plan__columns {
+  display: grid;
+  gap: var(--s-6);
+}
+
+.plan__column {
+  display: grid;
+  align-content: start;
+  gap: var(--s-4);
+}
+
+@media (min-width: 1024px) {
+  .plan__columns {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: var(--s-7);
+  }
+}
+
+/* Alerts: a bordered box with an icon. The life-critical shortfall is the only use of
+   --alarm; a cost mistake is a --warn. */
+
+.plan-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+  padding: var(--s-4);
+  border: 1px solid var(--warn);
+  border-radius: var(--r-control);
+  background: var(--night-800);
+}
+
+.plan-alert--alarm {
+  border-color: var(--alarm);
+}
+
+.plan-alert svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--warn);
+}
+
+.plan-alert--alarm svg {
+  color: var(--alarm);
+}
+
+.plan-alert p {
+  max-width: none;
+}
+
+.plan-alert ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plan__download {
+  justify-self: start;
+}

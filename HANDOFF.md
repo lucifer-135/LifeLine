@@ -101,7 +101,7 @@ We entered the non-residential (healthcare) track.
    - The battery is sized to night energy × min(1, longest outage ÷ night hours).
    - PV is sized for the **worst month** of irradiance.
    - The twin runs a warm-up day, so the starting battery charge is realistic.
-   - The controller sheds loads based on battery energy only and keeps diesel for emergencies.
+   - ~~The controller sheds loads based on battery energy only and keeps diesel for emergencies.~~ **Changed 2026-10-30 (user decision after the final review):** loads that can wait still pause on battery energy alone, but essential loads pause only when battery energy above the reserve plus the diesel the generator can deliver until the grid returns or the sun is strong cannot carry them.
    - The baseline has a 15-minute generator start gap at each outage.
 6. **Design direction: "Light stays on".**
    - Background is ward-night indigo, and lamp amber appears only where power is delivered.
@@ -190,13 +190,14 @@ Do not cite the Kano hospital's system size: one source says a 7 MW solar projec
 
 ## Next steps
 
-1. Get the user's choice of execution method: subagent-driven or native.
-2. Start PLAN.md Task 1. Ask the user to run `npx vercel` to log in, because Claude cannot log in.
-3. Remind the user to ask a mentor about the deadline and the judging categories.
+1. Vercel deploy (needs the user): `npx vercel` once to log in and link, then `npx vercel --prod`. Record the URL in Status.
+2. Merge the PR after reviewing it. Then record the demo video (about 3 minutes) from the live URL with `#/outage?autoplay=1` at 16×.
+3. Ask a mentor about the deadline and the judging categories; submit the link, video and description.
+4. Before submitting, remove the project docs you don't want public (CLAUDE.md, PLAN.md, DESIGN.md, HANDOFF.md) and reword CLAUDE.md line 4 if kept ("sizes solar, battery and diesel" → the engine sizes solar, battery and inverter; diesel is an input).
 
 ## Open risks
 
-- **Controller sheds on battery charge only (HANDOFF decision 5).** On some seeds (1–20) Lifeline pauses essential loads for up to 405 min/day while using under 3 L of the 50 L/day diesel. The demo seed 2026 sheds nothing. If judges try "New day", the essential-load comparison can favour the diesel-only baseline. A possible change: let diesel cover essential load before shedding it. That needs a decision and test updates.
+- **Controller trade-off (after the 2026-10-30 change).** Diesel now covers essential load before it is paused, so Lifeline never leaves essential loads unpowered longer than diesel-only on seeds 1–300 (was 40/300 typical, 59/300 rainy for kano-50). The cost: loads that can wait pause longer (kano-50 rainy seed 2026: 255 → 435 min) and Lifeline burns a little diesel (mean +₦6.4K/day typical, +₦9.5K rainy). Life-critical stays at 0 minutes unpowered on all 1,200 checked runs. "Simulate an outage" always resets to the typical day.
 
 - **Fonts.** Resolved: "Atkinson Hyperlegible Next" is on Google Fonts (CSS request returns 200, checked 2026-10-30).
 - **Judging criteria are unknown.** The design covers the likely axes: impact, feasibility, innovation, the demo, business model and scalability.

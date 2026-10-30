@@ -304,12 +304,67 @@ function lifelineStep(ctx: TwinContext, s: number, start: StepStart): TwinStep {
     : dispatchOutageStep(ctx, s, start)
 }
 
+// --- baseline controller: today's diesel-only setup ---
+
+// The first down step of an outage, wrapping past midnight. On an all-down day there
+// is none: the generator is already running.
+function isOutageStart(grid: GridPattern, s: number): boolean {
+  return !grid.up[s] && grid.up[(s + STEPS_PER_DAY - 1) % STEPS_PER_DAY]
+}
+
+// Serves tiers in priority order, T1 first. Unlike a subtraction from the total, this
+// gives exact zeros when nothing is available.
+function serveByPriority(loadKw: TierKw, availableKw: number): TierKw {
+  const served: TierKw = { T1: 0, T2: 0, T3: 0 }
+  let left = availableKw
+  for (const tier of ALL_TIERS) {
+    served[tier] = Math.min(left, loadKw[tier])
+    left -= served[tier]
+  }
+  return served
+}
+
+// No PV, no battery, no shedding. The grid serves everything while it is up. Each
+// outage starts dark because the generator is started by hand; after that it serves
+// what its rating and remaining fuel allow, life-critical first.
+function baselineStep(ctx: TwinContext, s: number, start: StepStart): TwinStep {
+  const { input } = ctx
+  const loadKw = loadAt(input.load, s)
+  const demandKw = sumTiers(loadKw, ALL_TIERS)
+  const gridUp = input.grid.up[s]
+  const litresPerKwh = input.costs.dieselLitresPerKwh
+
+  const generatorRunning = !gridUp && !isOutageStart(input.grid, s)
+  const dieselKw = generatorRunning
+    ? Math.min(demandKw, dieselLimitKw(input.generatorKw, start.fuelLeft, litresPerKwh))
+    : 0
+  const fuelLitresLeft = Math.max(0, start.fuelLeft - litresBurned(dieselKw, litresPerKwh))
+  return {
+    t: s,
+    gridUp,
+    loadKw,
+    servedKw: gridUp ? { ...loadKw } : serveByPriority(loadKw, dieselKw),
+    shedT2: false,
+    shedT3: false,
+    pvKw: 0,
+    pvUsedKw: 0,
+    curtailedKw: 0,
+    gridKw: gridUp ? demandKw : 0,
+    chargeKw: 0,
+    dischargeKw: 0,
+    dieselKw,
+    soc: 0,
+    fuelLitresLeft,
+    t1RunwayMin: t1RunwayMin(input, gridUp, 0, fuelLitresLeft, loadKw.T1),
+  }
+}
+
 function stepFunctionFor(scenario: Scenario): StepFunction {
   switch (scenario) {
     case 'lifeline':
       return lifelineStep
     case 'baseline':
-      throw new Error('baseline scenario not implemented yet')
+      return baselineStep
   }
 }
 

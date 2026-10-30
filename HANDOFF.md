@@ -6,8 +6,8 @@ Use this file to resume after compaction or a session limit. **Update it after e
 
 ## Status
 
-- **Last updated:** 2026-10-30, Task 13 complete; Task 14 in progress (cloud build session, subagent-driven).
-- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: Task 14 (Method page), then Task 15.
+- **Last updated:** 2026-10-30, Task 14 complete; Task 15 in progress (cloud build session, subagent-driven).
+- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: Task 15 (polish, accessibility, README), then the whole-branch review, the agreed history rewrite, and PR ready.
 - **Repo:** GitHub `lucifer-135/LifeLine` (private). Work branch `claude/modest-gauss-c677cd`, draft PR to `main`. Original local clone: `C:\Shivansh\Projects\Global-Energy-Hackathon`.
 - **Files present:**
   - `CLAUDE.md`
@@ -49,7 +49,7 @@ Keep this in sync with PLAN.md.
 | 11 | Hospital profile | done | Browser-checked 320–1440 px; sticky summary never covers a focused field. Re-picking the selected preset reloads it (discards edits). |
 | 12 | Outage day | done | Browser-checked: 16× median step 25.5 ms; no timer leaks on leave/return; no NaN/tier codes in the DOM; room labels follow cause (Paused = Lifeline shed, No power = unserved). Bundle 825 kB (Recharts) — build warning only. |
 | 13 | Plan & finance, proposal | done | Proposal prints to exactly 1 A4 page (checked with headless Chromium PDF). Cost errors stay fixable on the Plan page. |
-| 14 | Method & sources | todo | |
+| 14 | Method & sources | done | Formulas and controller text checked against the engine. Anchor links land below the sticky nav (re-scroll after web fonts load). |
 | 15 | Polish, a11y, README, deploy | todo | |
 | — | Demo video and submission | todo | not code |
 

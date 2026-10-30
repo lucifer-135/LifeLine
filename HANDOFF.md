@@ -6,8 +6,8 @@ Use this file to resume after compaction or a session limit. **Update it after e
 
 ## Status
 
-- **Last updated:** 2026-10-30, Task 9 complete (cloud build session, subagent-driven).
-- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: Task 10 (Home page).
+- **Last updated:** 2026-10-30, Task 10 complete (cloud build session, subagent-driven).
+- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: Task 11 (Hospital profile page).
 - **Repo:** GitHub `lucifer-135/LifeLine` (private). Work branch `claude/modest-gauss-c677cd`, draft PR to `main`. Original local clone: `C:\Shivansh\Projects\Global-Energy-Hackathon`.
 - **Files present:**
   - `CLAUDE.md`
@@ -26,6 +26,8 @@ Use this file to resume after compaction or a session limit. **Update it after e
 
 ### Needs user
 
+- **Commit history rewrite (agreed).** Commits up to `184be6f` are authored as Claude with co-author trailers. From `947684a` on, commits use Shivansh Gautam with no trailers (CLAUDE.md "No AI attribution"). After Task 15 and the final review, the branch history is rewritten to your authorship with trailers stripped, then force-pushed once (with lease).
+
 - **Vercel deploy (PLAN Task 1 Step 7, every "redeploy" step, Task 15 Step 5).** Claude cannot log in. Run `npx vercel` once to log in and link the project, then `npx vercel --prod`. Record the URL here.
 
 ### Task tracker
@@ -43,7 +45,7 @@ Keep this in sync with PLAN.md.
 | 7 | Finance and formatters | done | kano-50: capex ₦44.1M, fee ₦4.6M/mo, hospital saves ₦13.7M/yr, payback 1.0 yrs, IRR 103%, CO₂ avoided 43 t/yr. |
 | 8 | App shell, state, router, tokens | done | Placeholder pages (named exports) at final paths; Tasks 10–14 replace them. Lint: 2 accepted `only-export-components` warnings on AppState.tsx. |
 | 9 | Shared components | done | CountUp renders the number twice (animated aria-hidden + visually hidden final value). |
-| 10 | Home | todo | |
+| 10 | Home | done | Browser-checked at 375–1440 px with headless Chromium, including reduced motion. Hero scene in `src/pages/HeroScene.tsx`. Redeploy needs the user. |
 | 11 | Hospital profile | todo | |
 | 12 | Outage day | todo | demo money shot |
 | 13 | Plan & finance, proposal | todo | |

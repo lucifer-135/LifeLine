@@ -418,6 +418,17 @@ export function computeMetrics(steps: TwinStep[], costs: CostAssumptions): TwinM
   }
 }
 
+// Metrics for the day so far: steps 0 to `uptoStep`, both included, so the live
+// totals during playback end at exactly `TwinResult.metrics`.
+export function partialMetrics(
+  result: TwinResult,
+  uptoStep: number,
+  costs: CostAssumptions,
+): TwinMetrics {
+  const lastStep = Math.min(Math.max(uptoStep, 0), result.steps.length - 1)
+  return computeMetrics(result.steps.slice(0, lastStep + 1), costs)
+}
+
 // --- run ---
 
 function runDay(ctx: TwinContext, stepFunction: StepFunction, first: StepStart): TwinStep[] {

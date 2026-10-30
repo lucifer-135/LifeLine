@@ -1,0 +1,139 @@
+/* Load chart (DESIGN §9). The axis widths match AXIS_WIDTH in LoadChart.tsx, so the
+   grid strip lines up with the plot area. Without storage there is no right axis. */
+
+.load-chart {
+  --axis-left: 44px;
+  --axis-right: 44px;
+  display: grid;
+  gap: var(--s-3);
+  padding: var(--s-4) var(--s-5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  background: var(--night-800);
+}
+
+.load-chart[data-storage='false'] {
+  --axis-right: 0px;
+}
+
+.load-chart h2 {
+  font-size: var(--fs-md);
+}
+
+/* Holds the hatch pattern that the chart and the legend both use. */
+.load-chart__defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+}
+
+.chart-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.chart-legend__swatch {
+  flex: none;
+}
+
+.load-chart__figure {
+  display: grid;
+  gap: var(--s-1);
+}
+
+.load-chart__axis-titles {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+}
+
+.load-chart__strip {
+  position: relative;
+  padding-inline: var(--axis-left) var(--axis-right);
+}
+
+.load-chart__strip-label {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  line-height: 1;
+  transform: translateY(-50%);
+}
+
+.load-chart__strip-bar {
+  display: block;
+  width: 100%;
+  height: 10px;
+}
+
+.load-chart__strip-off {
+  fill: var(--night-700);
+}
+
+.load-chart__strip-on {
+  fill: var(--grid);
+}
+
+.load-chart__plot {
+  height: 240px;
+}
+
+.load-chart__battery-dot {
+  fill: var(--battery);
+  stroke: var(--night-800);
+  stroke-width: 2;
+}
+
+.chart-tooltip {
+  padding: var(--s-2) var(--s-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-control);
+  background: var(--night-900);
+  font-size: var(--fs-sm);
+}
+
+.chart-tooltip__time {
+  font-weight: 700;
+}
+
+.chart-tooltip__rows {
+  display: grid;
+  margin: var(--s-1) 0 0;
+}
+
+.chart-tooltip__row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-4);
+}
+
+.chart-tooltip__row dt {
+  color: var(--text-muted);
+}
+
+.chart-tooltip__row dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 768px) {
+  .load-chart__plot {
+    height: 320px;
+  }
+}

@@ -1,0 +1,21 @@
+/* Playback bar (DESIGN §6.2): play/pause, speed and the time-of-day scrubber. */
+
+.playback {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--s-3) var(--s-4);
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  background: var(--night-800);
+}
+
+.playback__toggle {
+  min-width: 112px;
+}
+
+.playback__scrubber {
+  flex: 1 1 240px;
+  min-width: 0;
+}

@@ -1,0 +1,140 @@
+/* Event log (DESIGN §6.2). From 768px it fills the right column under the runway and
+   scrolls; below that it folds away behind an "Event log (n)" button. */
+
+.event-log {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  height: 100%;
+  padding: var(--s-4) var(--s-5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  background: var(--night-800);
+}
+
+.event-log__title {
+  font-size: var(--fs-md);
+}
+
+.event-log__toggle-heading {
+  display: none;
+  font-size: var(--fs-md);
+}
+
+.event-log__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.event-log__list {
+  display: grid;
+  gap: var(--s-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The time leads each entry; a left rule marks alarms (red) and power coming back (lamp). */
+.event-log__entry {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--s-3);
+  padding: var(--s-1) 0 var(--s-1) var(--s-3);
+  border-left: 2px solid var(--line);
+  font-size: var(--fs-sm);
+}
+
+.event-log__entry--alarm {
+  border-left-color: var(--alarm);
+}
+
+.event-log__entry--restore {
+  border-left-color: var(--lamp);
+}
+
+.event-log__time {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-stretch: 75%;
+  font-size: var(--fs-base);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
+.event-log__icon {
+  margin-right: var(--s-1);
+  color: var(--alarm);
+  vertical-align: -3px;
+}
+
+@media (max-width: 767px) {
+  .event-log {
+    gap: 0;
+    padding-block: var(--s-1);
+  }
+
+  .event-log__title {
+    display: none;
+  }
+
+  .event-log__toggle-heading {
+    display: block;
+  }
+
+  .event-log__toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .event-log__chevron {
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+
+  .event-log[data-open='true'] .event-log__chevron {
+    transform: rotate(180deg);
+  }
+
+  /* Collapsible: rows 0fr to 1fr (DESIGN §4). Hidden content leaves the tab and
+     reading order. */
+  .event-log__body {
+    display: grid;
+    grid-template-rows: 0fr;
+    overflow: hidden;
+    visibility: hidden;
+    transition:
+      grid-template-rows var(--dur-base) var(--ease-out),
+      visibility var(--dur-base);
+  }
+
+  .event-log[data-open='true'] .event-log__body {
+    grid-template-rows: 1fr;
+    visibility: visible;
+  }
+
+  .event-log__list {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .event-log[data-open='true'] .event-log__list {
+    max-height: 50vh;
+    padding-bottom: var(--s-3);
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 767px) and (prefers-reduced-motion: reduce) {
+  .event-log__body,
+  .event-log__chevron {
+    transition: none;
+  }
+}

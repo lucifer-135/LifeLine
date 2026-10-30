@@ -1,0 +1,67 @@
+/* ICU runway (DESIGN §6.2): grid power, cover left in storage, or the alarm. */
+
+.runway {
+  display: grid;
+  gap: var(--s-3);
+  padding: var(--s-4) var(--s-5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  background: var(--night-800);
+}
+
+/* Tall enough for the label over the 64px number, so switching state never moves
+   the event log. */
+.runway__main {
+  display: grid;
+  align-content: center;
+  gap: var(--s-1);
+  min-height: 96px;
+}
+
+.runway__status {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.runway__status--grid {
+  color: var(--grid);
+}
+
+.runway__status--alarm {
+  color: var(--alarm);
+}
+
+.runway__label {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.runway__value {
+  color: var(--lamp);
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+
+.runway[data-level='warn'] .runway__value {
+  color: var(--warn);
+}
+
+.runway__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1) var(--s-4);
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.runway__reading {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+}

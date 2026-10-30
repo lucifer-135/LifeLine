@@ -1,0 +1,331 @@
+/* The living floor plan (DESIGN §6.2). Architectural plan drawing: 2px walls with door
+   gaps, and lamp light only where power is delivered. Sizes are SVG user units, so
+   text scales with the plan; mapLayout.ts picks a plan that keeps it at 12px or more. */
+
+.hospital-map {
+  position: relative;
+  padding: var(--s-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  background: var(--night-950);
+}
+
+.hospital-map__plan {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  font-family: var(--font-body);
+}
+
+.map-label {
+  font-size: 14px;
+  fill: var(--text-muted);
+}
+
+/* Rooms */
+
+.map-room {
+  cursor: pointer;
+  outline: none;
+}
+
+.map-room__floor {
+  fill: var(--night-900);
+}
+
+/* Lit rooms glow (one of the three places that may). motion sets the light's opacity
+   per state: 1 when lit, 8/22 when dim, 0 when dark or without power. */
+.map-room__fill {
+  fill: var(--lamp);
+  fill-opacity: 0.22;
+  filter: drop-shadow(0 0 10px var(--lamp-glow));
+}
+
+/* Window ticks: dark slots in the wall, filled with lamp light while the room is lit. */
+.map-room__windows line {
+  stroke: var(--night-700);
+  stroke-width: 4;
+}
+
+.map-room__windows--lit line {
+  stroke: var(--lamp);
+  filter: drop-shadow(0 0 4px var(--lamp));
+}
+
+.map-room__walls {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 2;
+  stroke-linecap: square;
+}
+
+.map-room__alarm {
+  fill: none;
+  stroke: var(--alarm);
+  stroke-width: 2;
+}
+
+.map-room__alarm-icon {
+  color: var(--alarm);
+}
+
+.map-room__focus {
+  fill: none;
+  stroke: var(--lamp);
+  stroke-width: 2;
+  opacity: 0;
+}
+
+.map-room:focus-visible .map-room__focus {
+  opacity: 1;
+}
+
+.map-room:hover .map-room__walls {
+  stroke: var(--text-faint);
+}
+
+.map-room__name {
+  font-size: 14px;
+  font-weight: 700;
+  fill: var(--text-muted);
+}
+
+.map-room--lit .map-room__name {
+  fill: var(--text);
+}
+
+.map-room__status {
+  font-size: 14px;
+  fill: var(--text-muted);
+}
+
+.map-room--alarm .map-room__status {
+  font-weight: 700;
+  fill: var(--alarm);
+}
+
+/* Roof array: each panel's fill is the share of rated solar output (inline style). */
+
+.map-roof__panel {
+  fill: var(--solar);
+  fill-opacity: 0;
+  stroke: var(--solar);
+  stroke-opacity: 0.6;
+  stroke-width: 1.5;
+  transition: fill-opacity var(--dur-base) var(--ease-out);
+}
+
+.map-roof--none .map-roof__panel {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-opacity: 1;
+  stroke-dasharray: 4 3;
+}
+
+/* Grid cable */
+
+.map-grid__cable {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 3;
+}
+
+.map-grid--up .map-grid__cable {
+  stroke: var(--grid);
+}
+
+.map-grid__meter {
+  fill: var(--night-800);
+  stroke: var(--line-strong);
+  stroke-width: 1.5;
+}
+
+.map-grid--up .map-grid__meter {
+  stroke: var(--grid);
+}
+
+.map-grid__cross {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+/* Battery room: five cells that follow the state of charge. */
+
+.map-battery__cell {
+  fill: none;
+  stroke: var(--battery);
+  stroke-opacity: 0.45;
+  stroke-width: 1.5;
+}
+
+.map-battery__cell--on {
+  fill: var(--battery);
+  stroke-opacity: 1;
+}
+
+.map-battery--none .map-battery__cell {
+  stroke: var(--line-strong);
+  stroke-opacity: 1;
+}
+
+/* Generator: smoke rises while it runs. */
+
+.map-generator__machine {
+  fill: var(--night-800);
+  stroke: var(--diesel);
+  stroke-width: 1.5;
+}
+
+.map-generator--running .map-generator__machine {
+  fill: color-mix(in srgb, var(--diesel) 30%, var(--night-800));
+}
+
+.map-generator--running .map-room__status {
+  fill: var(--text);
+}
+
+.map-generator__stack {
+  fill: var(--diesel);
+}
+
+.map-generator__puff {
+  fill: var(--diesel);
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: smoke-rise 1.8s ease-out infinite;
+}
+
+.map-generator__puff:nth-child(2) {
+  animation-delay: 0.6s;
+}
+
+.map-generator__puff:nth-child(3) {
+  animation-delay: 1.2s;
+}
+
+@keyframes smoke-rise {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.6);
+  }
+  20% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(10px, -36px) scale(1.6);
+  }
+}
+
+/* Room popover */
+
+.room-popover {
+  --pop-w: min(340px, 100%);
+  position: absolute;
+  z-index: var(--z-sticky);
+  top: calc(var(--s-3) + var(--pop-y) * (100% - 2 * var(--s-3)) - var(--s-2));
+  left: min(calc(var(--s-3) + var(--pop-x) * (100% - 2 * var(--s-3))), calc(100% - var(--pop-w)));
+  width: var(--pop-w);
+  padding: var(--s-3) var(--s-4) var(--s-4);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-panel);
+  background: var(--night-800);
+}
+
+.room-popover__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+}
+
+.room-popover__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-right: calc(-1 * var(--s-2));
+  border: 0;
+  border-radius: var(--r-control);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.room-popover__close:hover {
+  color: var(--text);
+}
+
+.room-popover__items {
+  display: grid;
+  max-height: 320px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.room-popover__item {
+  display: grid;
+  grid-template-areas:
+    'name kw'
+    'badge status';
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--s-1) var(--s-3);
+  padding-block: var(--s-2);
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-sm);
+}
+
+.room-popover__name {
+  grid-area: name;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.room-popover__item .tier-badge {
+  grid-area: badge;
+  justify-self: start;
+}
+
+.room-popover__status {
+  grid-area: status;
+  justify-self: end;
+}
+
+.room-popover__kw {
+  grid-area: kw;
+  justify-self: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.room-popover__status--powered {
+  color: var(--lamp);
+}
+
+.room-popover__status--paused,
+.room-popover__status--idle {
+  color: var(--text-muted);
+}
+
+.room-popover__status--no-power {
+  font-weight: 700;
+  color: var(--alarm);
+}
+
+/* Reduced motion: no smoke and no fades; rooms change state at once (motion). */
+@media (prefers-reduced-motion: reduce) {
+  .map-generator__smoke {
+    display: none;
+  }
+
+  .map-roof__panel {
+    transition: none;
+  }
+}

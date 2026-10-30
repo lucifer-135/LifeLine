@@ -1,0 +1,90 @@
+/* Comparison (DESIGN §6.2): both scenarios side by side, then the verdict. */
+
+.comparison {
+  display: grid;
+  gap: var(--s-4);
+}
+
+.comparison__columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-3);
+}
+
+.comparison__column {
+  padding: var(--s-4);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--diesel);
+  border-radius: var(--r-panel);
+  background: var(--night-800);
+}
+
+.comparison__column--lifeline {
+  border-top-color: var(--lamp);
+}
+
+.comparison__rows {
+  display: grid;
+  gap: var(--s-3);
+  margin: var(--s-3) 0 0;
+}
+
+.comparison__row dt {
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+}
+
+.comparison__row dd {
+  margin: 0;
+  line-height: 1.1;
+}
+
+/* The lead row uses the 36px live-number size; the rest are a step down. */
+.comparison__value {
+  font-size: var(--fs-xl);
+}
+
+.comparison__row--lead .comparison__value {
+  font-size: var(--fs-2xl);
+}
+
+.comparison__value--alarm {
+  color: var(--alarm);
+}
+
+.comparison__value--lit {
+  color: var(--lamp);
+}
+
+/* The only centred text in the app (DESIGN §3). */
+.comparison__verdict {
+  justify-self: center;
+  max-width: 60ch;
+  padding: var(--s-4) var(--s-5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  background: var(--night-800);
+  font-size: var(--fs-lg);
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* From 768px the three running totals share one row under the lead figure. */
+@media (min-width: 768px) {
+  .comparison__columns {
+    gap: var(--s-4);
+  }
+
+  .comparison__column {
+    padding: var(--s-5);
+  }
+
+  .comparison__rows {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-4);
+  }
+
+  .comparison__row--lead {
+    grid-column: 1 / -1;
+  }
+}

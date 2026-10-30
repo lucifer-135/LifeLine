@@ -1,6 +1,6 @@
 # Lifeline — hospital power continuity
 
-Lifeline sizes solar, batteries and backup diesel for Nigerian hospitals, then plays a full day of grid outages to show, minute by minute, that life-critical care stays powered. It ends with an Energy-as-a-Service price the hospital can pay monthly instead of buying the system up front.
+Lifeline sizes solar, batteries and an inverter for Nigerian hospitals, alongside their existing diesel generator, then plays a full day of grid outages to show, minute by minute, that life-critical care stays powered. It ends with an Energy-as-a-Service price the hospital can pay monthly instead of buying the system up front.
 
 Built for the Global Energy Hackathon 2026 (Anneru Solutions), Availability pillar, non-residential (healthcare) track.
 
@@ -57,7 +57,7 @@ The Method page in the app has the full detail and the formulas.
 **Sizing.** Lifeline sizes for the load it must keep on: life-critical plus essential. Loads that can wait are not sized for, because the controller pauses them first.
 
 - Battery size = night energy × outage share of the night ÷ (0.8 usable × 0.9 round trip), rounded up to the next 5 kWh.
-- Solar size = daily energy × share of the day without grid ÷ 0.9 round trip ÷ (worst-month sun hours × 0.75 performance ratio), rounded up to the next 1 kWp. Sun hours are for the cloudiest month in the hospital's state, so the system still holds in the rains.
+- Solar size = daily energy × share of the day without grid ÷ 0.9 round trip ÷ (worst-month sun hours × 0.75 performance ratio), rounded up to the next 1 kWp. Sun hours are for the month with the least sun in the hospital's state (August in most states, when the rains are heaviest).
 - Inverter size = 1.25 × peak load, rounded up to the next 1 kW.
 
 **The controller.** The simulation steps through one day in 15-minute steps. It runs the day twice and shows the second run, so the battery starts at a realistic charge.
@@ -90,10 +90,10 @@ Every default number in the app has a source. Open **Method & sources** in the a
 
 ## Limits
 
-- It simulates one representative day, not a full year.
+- Simulates one representative day, not a full year.
 - Equipment ratings are typical values, not a site audit. Field tests found real draw differs from labels by −45% to +56%.
-- Prices are from October 2026 and change fast; edit them on the plan page.
-- The grid outage pattern is simulated from a random seed, not measured. Real feeder data would replace it in a pilot.
+- Prices were checked in October 2026 (diesel is the May 2026 NBS average) and change fast; edit them on the plan page.
+- The grid outage pattern is generated, not measured. Real feeder data would replace it in a pilot.
 
 ## Accessibility
 

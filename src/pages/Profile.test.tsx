@@ -8,11 +8,16 @@ import { Profile } from './Profile'
 
 // Shows the equipment state the page writes, so a test can look past the DOM.
 function StateProbe() {
-  const { state } = useApp()
+  const { state, dispatch } = useApp()
   return (
-    <output data-testid="equipment">
-      {JSON.stringify(state.profile.equipment.map(({ id, qty, dutyCycle }) => ({ id, qty, dutyCycle })))}
-    </output>
+    <>
+      <output data-testid="equipment">
+        {JSON.stringify(state.profile.equipment.map(({ id, qty, dutyCycle }) => ({ id, qty, dutyCycle })))}
+      </output>
+      <button type="button" onClick={() => dispatch({ type: 'updateCosts', patch: { dieselNgnPerLitre: -1 } })}>
+        Break the costs
+      </button>
+    </>
   )
 }
 
@@ -301,9 +306,28 @@ describe('Profile', { timeout: 15_000 }, () => {
     expect(runButton()).toBeDisabled()
   })
 
-  test('Run outage day goes to the outage page', () => {
+  test('a cost error in the alert box links to the plan page, where it can be fixed', () => {
+    renderProfile()
+    fireEvent.click(screen.getByRole('button', { name: 'Break the costs' }))
+
+    const alert = screen.getByRole('alert')
+    expect(alert).toHaveTextContent('Diesel price must be zero or more.')
+    expect(within(alert).getByRole('link', { name: 'Fix on the plan page' })).toHaveAttribute('href', '#/plan')
+    expect(runButton()).toBeDisabled()
+  })
+
+  test('a profile error in the alert box has no plan page link', () => {
+    renderProfile()
+    removeAllLifeCritical()
+
+    const alert = screen.getByRole('alert')
+    expect(alert).toHaveTextContent('Add at least one life-critical item.')
+    expect(within(alert).queryByRole('link', { name: 'Fix on the plan page' })).not.toBeInTheDocument()
+  })
+
+  test('Run outage day goes to the outage page and starts playing', () => {
     renderProfile()
     fireEvent.click(runButton())
-    expect(window.location.hash).toBe('#/outage')
+    expect(window.location.hash).toBe('#/outage?autoplay=1')
   })
 })

@@ -6,6 +6,16 @@ export function formatDuration(min: number): string {
   return `${Math.floor(totalMin / 60)}h ${totalMin % 60}m`
 }
 
+// Beyond this the exact figure means little, and with almost no life-critical load the
+// engine's runway grows towards billions of hours.
+const RUNWAY_CAP_MIN = 99 * 60
+
+// A runway for the gauge and the event log: "over 99h" past the cap, otherwise as
+// formatDuration. A non-finite value stays a dash.
+export function formatRunway(min: number): string {
+  return Number.isFinite(min) && min > RUNWAY_CAP_MIN ? 'over 99h' : formatDuration(min)
+}
+
 const NOT_AVAILABLE = 'n/a'
 const COMPACT_SUFFIXES = ['', 'K', 'M', 'B']
 const LAST_COMPACT_UNIT = COMPACT_SUFFIXES.length - 1
@@ -69,4 +79,25 @@ export function formatPct(x: number): string {
 export function formatYears(y: number | null): string {
   if (y === null || !Number.isFinite(y)) return NOT_AVAILABLE
   return `${y.toFixed(1)} yrs`
+}
+
+const WHOLE_NUMBER = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 })
+
+// Rounds first, and adds 0 so a tiny negative reads "0", not "-0". Overflowed values
+// (a huge CO₂ factor times the litres) read "n/a" instead of "Infinity".
+function formatWhole(n: number): string {
+  if (!Number.isFinite(n)) return NOT_AVAILABLE
+  return WHOLE_NUMBER.format(Math.round(n) + 0)
+}
+
+// 1234.5 -> "1,235 L". "n/a" for NaN or Infinity.
+export function formatLitres(litres: number): string {
+  const whole = formatWhole(litres)
+  return whole === NOT_AVAILABLE ? whole : `${whole} L`
+}
+
+// 4521.2 -> "4,521 kg". "n/a" for NaN or Infinity.
+export function formatKg(kg: number): string {
+  const whole = formatWhole(kg)
+  return whole === NOT_AVAILABLE ? whole : `${whole} kg`
 }

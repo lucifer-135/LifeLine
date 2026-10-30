@@ -255,7 +255,9 @@
 
 .profile-errors li {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  gap: 0 var(--s-3);
   min-height: 44px;
 }
 

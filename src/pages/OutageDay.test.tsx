@@ -19,7 +19,7 @@ const demo = runComparison({ profile: demoProfile, costs: DEFAULT_COSTS, seed: D
 // The first step where the grid goes down after being up.
 const firstOutageStep = demo.grid.up.findIndex((up, s) => s > 0 && !up && demo.grid.up[s - 1])
 
-// Breaks the profile and shows the seed, so a test can reach past the page.
+// Breaks the profile or the costs and shows the seed, so a test can reach past the page.
 function StateProbe() {
   const { state, dispatch } = useApp()
   return (
@@ -27,6 +27,9 @@ function StateProbe() {
       <output data-testid="seed">{state.seed}</output>
       <button type="button" onClick={() => dispatch({ type: 'updateProfile', patch: { beds: 0 } })}>
         Break the profile
+      </button>
+      <button type="button" onClick={() => dispatch({ type: 'updateCosts', patch: { dieselNgnPerLitre: -1 } })}>
+        Break the costs
       </button>
     </>
   )
@@ -58,9 +61,10 @@ function runway(): HTMLElement {
   return screen.getByRole('region', { name: 'ICU runway' })
 }
 
-// The ward rooms on the floor plan: buttons whose name is "{Room}: {state}, … kW served".
+// The ward rooms on the floor plan: buttons whose name is "{Room}: {state}, … kW served",
+// or "{Room}: lit, not in use" for a lit room with nothing switched on.
 function roomButtons(): HTMLElement[] {
-  return screen.getAllByRole('button', { name: /kW served$/ })
+  return screen.getAllByRole('button', { name: /(kW served|not in use)$/ })
 }
 
 // A phone-width screen: the query EventLog folds the log at matches, nothing else does.
@@ -172,6 +176,30 @@ describe('OutageDay', () => {
     expect(vi.getTimerCount()).toBe(0)
   })
 
+  test('invalid costs on a valid profile send the user to the plan page, not the profile', () => {
+    renderOutage('#/outage?autoplay=1')
+    fireEvent.click(screen.getByRole('button', { name: 'Break the costs' }))
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Outage day' })).toBeInTheDocument()
+    expect(screen.getByText("The cost assumptions have errors, so the outage day can't run.")).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Fix cost assumptions' })).toHaveAttribute('href', '#/plan')
+    expect(screen.queryByText(/hospital profile has errors/)).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Fix hospital profile' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('slider')).not.toBeInTheDocument()
+    advance(1000)
+    expect(vi.getTimerCount()).toBe(0)
+  })
+
+  test('a broken profile still points to the profile when the costs are broken too', () => {
+    renderOutage('#/outage?autoplay=1')
+    fireEvent.click(screen.getByRole('button', { name: 'Break the costs' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Break the profile' }))
+
+    expect(screen.getByText("This hospital profile has errors, so the outage day can't run.")).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Fix hospital profile' })).toHaveAttribute('href', '#/profile')
+    expect(screen.queryByRole('link', { name: 'Fix cost assumptions' })).not.toBeInTheDocument()
+  })
+
   test('#/outage?autoplay=1 plays the day on a timer', () => {
     renderOutage('#/outage?autoplay=1')
     expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument()
@@ -269,6 +297,19 @@ describe('OutageDay', () => {
     expect(within(plan).queryByText('Partly paused')).not.toBeInTheDocument()
     // The theatre runs office hours only, so at night it is dark for want of power, not paused.
     expect(screen.getByRole('button', { name: /^Theatre: no power,/ })).toBeInTheDocument()
+  })
+
+  test('a lit room with nothing switched on reads "not in use", not "0.0 kW served"', () => {
+    // The theatre runs office hours only, so at night it is idle; with the grid up it is lit.
+    const nightGridUpStep = demo.grid.up.findIndex((up, s) => up && (s < 32 || s >= 68))
+    expect(nightGridUpStep).toBeGreaterThanOrEqual(0)
+    renderOutage()
+    seek(nightGridUpStep)
+
+    expect(screen.getByRole('button', { name: 'Theatre: lit, not in use' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^Theatre: .*0\.0 kW served$/ })).not.toBeInTheDocument()
+    // Rooms with something running keep the served figure.
+    expect(screen.getByRole('button', { name: /^ICU: lit, \d+\.\d kW served$/ })).toBeInTheDocument()
   })
 
   test('with Lifeline, loads it sheds still read as paused', () => {

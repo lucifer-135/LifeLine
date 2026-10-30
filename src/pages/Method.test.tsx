@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { SOURCES } from '../data/sources'
 import {
   BATTERY_DOD,
+  BATTERY_RESERVE_SOC,
   BATTERY_ROUND_TRIP,
   INVERTER_HEADROOM,
   PV_PERFORMANCE_RATIO,
@@ -55,6 +56,23 @@ describe('Method page structure', () => {
     }
   })
 
+  test('sizes solar for the month with the least sun, not the cloudiest', () => {
+    render(<Method />)
+    const sizing = sectionOf('How sizing works').textContent ?? ''
+    expect(sizing).toContain(
+      'the month with the least sun in the hospital’s state (August in most states, when the rains are heaviest)',
+    )
+    expect(sizing).not.toMatch(/cloudiest/i)
+  })
+
+  test('says in one sentence that the model settings are not sourced values', () => {
+    render(<Method />)
+    const sizing = sectionOf('How sizing works').textContent ?? ''
+    expect(sizing).toContain(
+      `The ${BATTERY_DOD} usable, ${BATTERY_ROUND_TRIP} round trip, ${PV_PERFORMANCE_RATIO} performance ratio and ${INVERTER_HEADROOM} headroom factors and the ${Math.round(BATTERY_RESERVE_SOC * 100)}% battery reserve are model settings, not sourced values, so they are not in the Sources table.`,
+    )
+  })
+
   test('explains the finance formulas with the Energy-as-a-Service guarantee', () => {
     render(<Method />)
     const money = sectionOf('How the money works').textContent ?? ''
@@ -65,6 +83,22 @@ describe('Method page structure', () => {
   test('never shows the internal tier names', () => {
     const { container } = render(<Method />)
     expect(container.textContent).not.toMatch(/\bT[123]\b/)
+  })
+})
+
+describe('How the controller decides', () => {
+  test('the look-ahead compares the energy the loads need after solar with the battery above its reserve', () => {
+    render(<Method />)
+    expect(sectionOf('How the controller decides').textContent).toContain(
+      'It compares the energy the loads need after solar until then with the battery energy above a 20% reserve.',
+    )
+  })
+
+  test('today the generator serves life-critical load first, up to its rating, until the fuel runs out', () => {
+    render(<Method />)
+    expect(sectionOf('How the controller decides').textContent).toContain(
+      'After that the generator serves life-critical load first, up to its rating, then the rest, until the fuel runs out.',
+    )
   })
 })
 
@@ -79,7 +113,11 @@ describe('Sources table', () => {
   test('is a real table with a caption and column headers', () => {
     render(<Method />)
     const table = screen.getByRole('table')
-    expect(within(table).getByText(/every default number/i).tagName).toBe('CAPTION')
+    expect(within(table).getByText('Sourced values in Lifeline, with their source and date').tagName).toBe(
+      'CAPTION',
+    )
+    // The model settings are not in the table, so the caption cannot claim every number.
+    expect(within(table).queryByText(/every default number/i)).toBeNull()
     const headers = within(table).getAllByRole('columnheader')
     expect(headers.map((th) => th.textContent)).toEqual([
       'Value',
@@ -190,7 +228,7 @@ describe('Limits', () => {
     expect(items.map((item) => item.textContent)).toEqual([
       'Simulates one representative day, not a full year.',
       'Equipment ratings are typical values, not a site audit. Field tests found real draw differs from labels by −45% to +56%.',
-      'Prices are from October 2026 and change fast; edit them on the plan page.',
+      'Prices were checked in October 2026 (diesel is the May 2026 NBS average) and change fast; edit them on the plan page.',
       'The grid outage pattern is generated, not measured. Real feeder data would replace it in a pilot.',
     ])
   })

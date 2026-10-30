@@ -4,6 +4,7 @@ import type { Comparison } from '../engine/compare'
 import { STEPS_PER_DAY } from '../engine/constants'
 import { stepToClock } from '../engine/events'
 import type { Scenario, Season } from '../engine/types'
+import { validateProfile } from '../engine/validate'
 import { useApp } from '../state/AppState'
 import { useHashRoute } from '../state/useHashRoute'
 import { usePlayback } from '../state/usePlayback'
@@ -109,9 +110,22 @@ function OutageTwin({ comparison }: { comparison: Comparison }) {
 }
 
 export function OutageDay() {
-  const { comparison } = useApp()
+  const { state, comparison } = useApp()
 
   if (!comparison) {
+    // A valid profile with no comparison means the cost assumptions are the problem, and
+    // they are edited on the plan page, not the profile page.
+    if (validateProfile(state.profile).length === 0) {
+      return (
+        <div className="container outage outage--invalid">
+          <h1>Outage day</h1>
+          <p>The cost assumptions have errors, so the outage day can&apos;t run.</p>
+          <a className="button button--primary" href="#/plan">
+            Fix cost assumptions
+          </a>
+        </div>
+      )
+    }
     return (
       <div className="container outage outage--invalid">
         <h1>Outage day</h1>

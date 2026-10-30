@@ -1,19 +1,12 @@
 import { BatteryMedium, Fuel, PlugZap, TriangleAlert } from 'lucide-react'
 import type { TwinStep } from '../../engine/types'
-import { formatDuration } from '../../lib/format'
+import { formatRunway } from '../../lib/format'
 import { isUnderServed } from './roomState'
 import './RunwayGauge.css'
 
 // Under two hours of cover the runway turns to the warning colour (DESIGN §6.2).
 const WARN_BELOW_MIN = 120
-// Beyond this the exact figure means little, and with almost no life-critical load the
-// engine's runway grows towards billions of hours.
-const CAP_MIN = 99 * 60
 const EPS = 1e-9
-
-function formatRunway(minutes: number): string {
-  return minutes > CAP_MIN ? 'over 99h' : formatDuration(minutes)
-}
 
 interface RunwayGaugeProps {
   twinStep: TwinStep

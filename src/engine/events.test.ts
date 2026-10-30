@@ -23,6 +23,20 @@ test('formatEvent grid_lost shows a dash when the runway is not finite', () => {
   )
 })
 
+// With almost no life-critical load at grid loss the engine's runway grows towards
+// billions of hours; the log reads like the runway gauge instead of printing it.
+test('formatEvent grid_lost caps a runway above 99 hours', () => {
+  expect(formatEvent({ step: 0, kind: 'grid_lost', t1RunwayMin: 99 * 60 + 1 })).toBe(
+    'Grid lost. ICU covered for over 99h.',
+  )
+  expect(formatEvent({ step: 0, kind: 'grid_lost', t1RunwayMin: 6e11 })).toBe(
+    'Grid lost. ICU covered for over 99h.',
+  )
+  expect(formatEvent({ step: 0, kind: 'grid_lost', t1RunwayMin: 99 * 60 })).toBe(
+    'Grid lost. ICU covered for 99h 0m.',
+  )
+})
+
 test('formatEvent gives the exact copy for every kind', () => {
   const copy: Record<TwinEventKind, string> = {
     grid_lost: 'Grid lost. ICU covered for 45m.',

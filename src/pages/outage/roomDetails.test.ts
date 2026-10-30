@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import type { Equipment, Tier, TierKw, TwinStep, Ward } from '../../engine/types'
-import { itemKw, itemStatus, roomCondition, roomServedKw } from './roomDetails'
+import { isRoomIdle, itemKw, itemStatus, roomCondition, roomServedKw } from './roomDetails'
 
 const ALL_DAY = Array<boolean>(24).fill(true)
 const OFFICE = Array.from({ length: 24 }, (_, hour) => hour >= 8 && hour < 17)
@@ -74,6 +74,19 @@ describe('itemStatus', () => {
     expect(itemStatus(item('ICU', 'T1'), DAY_STEP, blackout)).toBe('no-power')
     expect(itemStatus(item('Lab', 'T2'), DAY_STEP, t2Short)).toBe('no-power')
     expect(itemStatus(item('Wards', 'T3'), DAY_STEP, blackout)).toBe('no-power')
+  })
+})
+
+describe('isRoomIdle', () => {
+  const theatre = [item('Theatre', 'T1', { scheduleMask: OFFICE }), item('Theatre', 'T2', { id: 'ac', scheduleMask: OFFICE })]
+
+  test('a room is idle when none of its items is switched on at that step', () => {
+    expect(isRoomIdle(theatre, NIGHT_STEP)).toBe(true)
+  })
+
+  test('one switched-on item is enough to make the room active', () => {
+    expect(isRoomIdle(theatre, DAY_STEP)).toBe(false)
+    expect(isRoomIdle([...theatre, item('Theatre', 'T1', { id: 'monitor' })], NIGHT_STEP)).toBe(false)
   })
 })
 

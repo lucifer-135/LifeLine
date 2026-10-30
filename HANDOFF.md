@@ -6,8 +6,8 @@ Use this file to resume after compaction or a session limit. **Update it after e
 
 ## Status
 
-- **Last updated:** 2026-10-30, Task 8 complete (cloud build session, subagent-driven).
-- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: Task 9 (shared components).
+- **Last updated:** 2026-10-30, Task 9 complete (cloud build session, subagent-driven).
+- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: Task 10 (Home page).
 - **Repo:** GitHub `lucifer-135/LifeLine` (private). Work branch `claude/modest-gauss-c677cd`, draft PR to `main`. Original local clone: `C:\Shivansh\Projects\Global-Energy-Hackathon`.
 - **Files present:**
   - `CLAUDE.md`
@@ -42,7 +42,7 @@ Keep this in sync with PLAN.md.
 | 6 | Twin: baseline, comparison, event copy | done | kano-50 seed 2026: today 315 min life-critical dark, 50 L, ₦179K/day; Lifeline 0 min, 0 L, ₦23K. Baseline runway divides fuel by the whole load (it never sheds). |
 | 7 | Finance and formatters | done | kano-50: capex ₦44.1M, fee ₦4.6M/mo, hospital saves ₦13.7M/yr, payback 1.0 yrs, IRR 103%, CO₂ avoided 43 t/yr. |
 | 8 | App shell, state, router, tokens | done | Placeholder pages (named exports) at final paths; Tasks 10–14 replace them. Lint: 2 accepted `only-export-components` warnings on AppState.tsx. |
-| 9 | Shared components | todo | |
+| 9 | Shared components | done | CountUp renders the number twice (animated aria-hidden + visually hidden final value). |
 | 10 | Home | todo | |
 | 11 | Hospital profile | todo | |
 | 12 | Outage day | todo | demo money shot |

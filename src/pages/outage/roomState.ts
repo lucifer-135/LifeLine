@@ -19,7 +19,8 @@ function wardList(ward: Wards): readonly Ward[] {
   return typeof ward === 'string' ? [ward] : ward
 }
 
-function itemsIn(ward: Wards, profile: HospitalProfile): Equipment[] {
+// Items of the ward(s) that exist in this hospital (quantity above 0), in profile order.
+export function itemsIn(ward: Wards, profile: HospitalProfile): Equipment[] {
   const wards = wardList(ward)
   return profile.equipment.filter((item) => item.qty > 0 && wards.includes(item.ward))
 }
@@ -30,14 +31,14 @@ export function hasEquipment(ward: Wards, profile: HospitalProfile): boolean {
   return itemsIn(ward, profile).length > 0
 }
 
-function isUnderServed(step: TwinStep, tier: Tier): boolean {
+export function isUnderServed(step: TwinStep, tier: Tier): boolean {
   return step.servedKw[tier] < step.loadKw[tier] - EPS
 }
 
 // The baseline never sets shed flags, yet it serves nothing at the start of an outage
 // or once the fuel runs out. Counting under-served load as off makes its rooms go dark
 // too, so the map tells the same story as the numbers.
-function isTierOff(step: TwinStep, tier: Tier): boolean {
+export function isTierOff(step: TwinStep, tier: Tier): boolean {
   if (tier === 'T2' && step.shedT2) return true
   if (tier === 'T3' && step.shedT3) return true
   return isUnderServed(step, tier)

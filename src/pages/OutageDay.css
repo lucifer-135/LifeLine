@@ -1,0 +1,77 @@
+/* Outage day (DESIGN §6.2). Mobile first: one column in reading order (map, runway,
+   event log, chart, playback, comparison). From 768px the map sits on the left and the
+   runway and event log share the right column. */
+
+.outage {
+  display: grid;
+  gap: var(--s-5);
+  padding-block: var(--s-6) var(--s-7);
+}
+
+.outage--invalid {
+  justify-items: start;
+  gap: var(--s-4);
+}
+
+.outage__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4) var(--s-5);
+}
+
+.outage__title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s-2) var(--s-4);
+}
+
+/* The day's clock reads like the monitor numbers below it. */
+.outage__clock {
+  color: var(--text);
+}
+
+.outage__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-3);
+}
+
+.outage__twin {
+  display: grid;
+  gap: var(--s-4);
+}
+
+.outage__timeline {
+  display: grid;
+  gap: var(--s-3);
+}
+
+@media (min-width: 768px) {
+  .outage__twin {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .outage__map {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+
+  .outage__runway {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  /* The map sets the height of the row; the log fills what the runway leaves and
+     scrolls. Size containment stops a long log from stretching the row instead. */
+  .outage__log {
+    grid-column: 2;
+    grid-row: 2;
+    min-height: 240px;
+    contain: size;
+  }
+}

@@ -43,6 +43,15 @@ describe('Method page structure', () => {
     ])
   })
 
+  test('the intro claims sources only for sourced values, not for the model settings', () => {
+    render(<Method />)
+    const intro = screen.getByRole('heading', { level: 1 }).closest('header')?.textContent ?? ''
+    expect(intro).toContain(
+      'Every sourced default value is listed with its source and date, and the model settings are explained where they are used.',
+    )
+    expect(intro).not.toMatch(/where each number comes from/i)
+  })
+
   test('sets formulas as plain text, never in a code font', () => {
     const { container } = render(<Method />)
     expect(container.querySelector('code, pre, kbd, samp')).toBeNull()
@@ -92,6 +101,15 @@ describe('How the controller decides', () => {
     expect(sectionOf('How the controller decides').textContent).toContain(
       'It compares the energy the loads need after solar until then with the battery energy above a 20% reserve.',
     )
+  })
+
+  test('counts usable diesel before pausing essential loads; loads that can wait pause on battery alone', () => {
+    render(<Method />)
+    const controller = sectionOf('How the controller decides').textContent ?? ''
+    expect(controller).toContain(
+      'Loads that can wait are paused first, whenever the battery alone cannot carry everything. Before pausing essential loads, the controller also counts the diesel the generator can supply until the grid returns or the sun is strong.',
+    )
+    expect(controller).not.toMatch(/kept for emergencies/i)
   })
 
   test('today the generator serves life-critical load first, up to its rating, until the fuel runs out', () => {

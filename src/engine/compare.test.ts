@@ -138,5 +138,20 @@ test('daily fuel is a thirtieth of the monthly litres', () => {
   expect(c.lifeline.metrics.dieselLitres).toBeLessThanOrEqual(kano.dieselLitresPerMonth / 30 + 1e-9)
 })
 
+test('Lifeline never leaves life-critical or essential load dark longer than today', () => {
+  for (const profile of [kano, presetById('phc')]) {
+    for (const season of ['typical', 'worst'] as const) {
+      for (let seed = 1; seed <= 50; seed++) {
+        const c = runComparison({ profile, costs: DEFAULT_COSTS, seed, season })
+        const where = `${profile.id} ${season} seed ${seed}`
+        expect(c.lifeline.metrics.t1MinutesUnpowered, where).toBe(0)
+        expect(c.lifeline.metrics.t2MinutesUnpowered, where).toBeLessThanOrEqual(
+          c.baseline.metrics.t2MinutesUnpowered,
+        )
+      }
+    }
+  }
+})
+
 test('runComparison is deterministic', () =>
   expect(runComparison(typicalInput)).toEqual(runComparison(typicalInput)))

@@ -133,6 +133,77 @@ test('sheds can-wait and essential when the battery cannot cover the outage, the
   expect(r.steps[75].servedKw).toEqual({ T1: 1, T2: 0, T3: 0 })
 })
 
+test('essential load stays on when battery plus diesel can carry it; can-wait pauses on battery alone', () => {
+  // Battery avail 9.11 kWh < need(T1+T2) 10 kWh, but the generator can deliver
+  // min(20 L / 0.3 L per kWh, 10 kW x 5 h) = 50 kWh before the grid returns, so essential
+  // load stays on. need(all) 15 kWh > 9.11 kWh of battery, so can-wait load still pauses.
+  // At 2 kW the battery reaches its reserve after 18 steps; diesel takes over at step 88.
+  const r = handBuilt({ generatorKw: 10, fuelLitresPerDay: 20 })
+  expect(r.events.map((e) => [e.step, e.kind])).toEqual([
+    [70, 'grid_lost'],
+    [70, 'shed_t3'],
+    [88, 'diesel_on'],
+    [90, 'grid_restored'],
+    [90, 'restore_t3'],
+    [90, 'diesel_off'],
+  ])
+  r.steps.slice(70, 90).forEach((s) => {
+    expect(s.shedT2).toBe(false)
+    expect(s.shedT3).toBe(true)
+    expect(s.servedKw).toEqual({ T1: 1, T2: 1, T3: 0 })
+  })
+  expect(r.metrics.t1MinutesUnpowered).toBe(0)
+  expect(r.metrics.t2MinutesUnpowered).toBe(0)
+  expect(r.metrics.dieselLitres).toBeGreaterThan(0)
+})
+
+test('without a generator or without fuel, essential load pauses on battery alone', () => {
+  const batteryOnly = handBuilt()
+  const cases: Partial<TwinInput>[] = [
+    { generatorKw: 0, fuelLitresPerDay: 20 },
+    { generatorKw: 10, fuelLitresPerDay: 0 },
+  ]
+  for (const over of cases) {
+    const r = handBuilt(over)
+    expect(r.steps.map((s) => [s.shedT2, s.shedT3])).toEqual(
+      batteryOnly.steps.map((s) => [s.shedT2, s.shedT3]),
+    )
+    expect(r.events).toEqual(batteryOnly.events)
+    expect(r.metrics).toEqual(batteryOnly.metrics)
+  }
+})
+
+test('essential load pauses when even battery plus diesel cannot carry it', () => {
+  // Fuel-limited: 0.2 L is 0.67 kWh, so 9.11 + 0.67 = 9.77 kWh < 10 kWh and essential
+  // pauses. Each T1-only step uses 0.25 kWh, and essential returns at step 78
+  // (6 < 0.8 x 7.77), two steps earlier than on battery alone.
+  const fuelLimited = handBuilt({ generatorKw: 10, fuelLitresPerDay: 0.2 })
+  expect(fuelLimited.events.map((e) => [e.step, e.kind])).toEqual([
+    [70, 'grid_lost'],
+    [70, 'shed_t3'],
+    [70, 'shed_t2'],
+    [78, 'restore_t2'],
+    [88, 'restore_t3'],
+    [90, 'grid_restored'],
+  ])
+  expect(fuelLimited.metrics.t2MinutesUnpowered).toBe(8 * 15)
+
+  // Rating-limited: a 0.1 kW generator delivers at most 0.1 kW x 5 h = 0.5 kWh before the
+  // grid returns, however much fuel is left. 9.11 + 0.5 = 9.61 kWh < 10 kWh, so essential
+  // pauses, and returns at step 79 (5.5 < 0.8 x (6.86 + 0.28)).
+  const ratingLimited = handBuilt({ generatorKw: 0.1, fuelLitresPerDay: 20 })
+  expect(ratingLimited.events.map((e) => [e.step, e.kind])).toEqual([
+    [70, 'grid_lost'],
+    [70, 'shed_t3'],
+    [70, 'shed_t2'],
+    [79, 'restore_t2'],
+    [87, 'restore_t3'],
+    [90, 'grid_restored'],
+  ])
+  expect(ratingLimited.metrics.t2MinutesUnpowered).toBe(9 * 15)
+  for (const r of [fuelLimited, ratingLimited]) expect(r.metrics.t1MinutesUnpowered).toBe(0)
+})
+
 test('a battery big enough for the whole outage sheds nothing', () => {
   const r = handBuilt({ size: { pvKwp: 0, batteryKwh: 40, inverterKw: 5 } })
   expect(r.steps.some((s) => s.shedT2 || s.shedT3)).toBe(false)

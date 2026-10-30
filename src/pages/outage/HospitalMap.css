@@ -1,4 +1,4 @@
-/* The living floor plan (DESIGN §6.2). Architectural plan drawing: 2px walls with door
+/* The living floor plan. Architectural plan drawing: 2px walls with door
    gaps, and lamp light only where power is delivered. Sizes are SVG user units, so
    text scales with the plan; mapLayout.ts picks a plan that keeps it at 12px or more. */
 

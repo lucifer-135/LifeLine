@@ -21,7 +21,7 @@ const RESERVE_PERCENT = `${Math.round(BATTERY_RESERVE_SOC * 100)}%`
 const hourLabel = (hour: number) => `${String(hour).padStart(2, '0')}:00`
 const STRONG_SUN_WINDOW = `${hourLabel(PV_STRONG_START_HOUR)}–${hourLabel(PV_STRONG_END_HOUR)}`
 
-// Copy from DESIGN §6.4, verbatim.
+// Method page copy, shown verbatim.
 const LIMITS = [
   'Simulates one representative day, not a full year.',
   'Equipment ratings are typical values, not a site audit. Field tests found real draw differs from labels by −45% to +56%.',

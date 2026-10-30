@@ -1,4 +1,4 @@
-/* Comparison (DESIGN §6.2): both scenarios side by side, then the verdict. */
+/* Comparison: both scenarios side by side, then the verdict. */
 
 .comparison {
   display: grid;
@@ -56,7 +56,7 @@
   color: var(--lamp);
 }
 
-/* The only centred text in the app (DESIGN §3). */
+/* The only centred text in the app. */
 .comparison__verdict {
   justify-self: center;
   max-width: 60ch;

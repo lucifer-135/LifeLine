@@ -1,4 +1,4 @@
-/* Assumptions (DESIGN §6.3): a disclosure that opens to a grid of number fields. */
+/* Assumptions: a disclosure that opens to a grid of number fields. */
 
 .assumptions {
   border: 1px solid var(--line);

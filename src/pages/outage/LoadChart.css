@@ -1,4 +1,4 @@
-/* Load chart (DESIGN §9). The axis widths match AXIS_WIDTH in LoadChart.tsx, so the
+/* Load chart. The axis widths match AXIS_WIDTH in LoadChart.tsx, so the
    grid strip lines up with the plot area. Without storage there is no right axis. */
 
 .load-chart {

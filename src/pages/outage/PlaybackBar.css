@@ -1,4 +1,4 @@
-/* Playback bar (DESIGN §6.2): play/pause, speed and the time-of-day scrubber. */
+/* Playback bar: play/pause, speed and the time-of-day scrubber. */
 
 .playback {
   display: flex;

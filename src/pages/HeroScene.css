@@ -1,4 +1,4 @@
-/* Home hero scene (DESIGN §6.0, motion §4.1). Lamp light only means "power
+/* Home hero scene. Lamp light only means "power
    delivered": city windows before the outage, hospital windows throughout. */
 
 .hero-scene {
@@ -58,7 +58,7 @@
   stroke-linejoin: round;
 }
 
-/* The "H" hospital sign, never a red cross (DESIGN §1). */
+/* The "H" hospital sign, never a red cross. */
 .hero-scene__sign {
   fill: var(--night-700);
   stroke: var(--text);

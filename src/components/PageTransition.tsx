@@ -1,7 +1,7 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import type { ReactNode } from 'react'
 
-// Matches --dur-fast, --ease-out and the 6px rise in DESIGN §4. Motion takes
+// Matches --dur-fast, --ease-out and the 6px rise. Motion takes
 // seconds and a number array, so the CSS tokens cannot be read here.
 const FADE_SECONDS = 0.18
 const RISE_PX = 6

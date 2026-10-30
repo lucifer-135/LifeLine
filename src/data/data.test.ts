@@ -156,7 +156,7 @@ test('presets do not share mutable schedule arrays', () => {
 
 // --- costs and sources ---
 
-test('default costs equal the HANDOFF numbers', () =>
+test('default costs equal the sourced numbers', () =>
   expect(DEFAULT_COSTS).toEqual({
     dieselNgnPerLitre: 3277,
     gridNgnPerKwh: 209.5,
@@ -188,7 +188,7 @@ test('cost source values match DEFAULT_COSTS', () => {
 test('the diesel price label is the validation label', () =>
   expect(sourceById('cost.dieselNgnPerLitre').label).toBe('Diesel price'))
 
-test('estimate flags follow HANDOFF', () => {
+test('estimate flags follow the sources', () => {
   expect(sourceById('cost.dieselNgnPerLitre').isEstimate).toBe(false)
   expect(sourceById('cost.gridNgnPerKwh').isEstimate).toBe(false)
   expect(sourceById('cost.pvNgnPerKwp').isEstimate).toBe(true)

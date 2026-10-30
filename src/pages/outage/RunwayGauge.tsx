@@ -4,7 +4,7 @@ import { formatRunway } from '../../lib/format'
 import { isUnderServed } from './roomState'
 import './RunwayGauge.css'
 
-// Under two hours of cover the runway turns to the warning colour (DESIGN §6.2).
+// Under two hours of cover the runway turns to the warning colour.
 const WARN_BELOW_MIN = 120
 const EPS = 1e-9
 

@@ -1,4 +1,4 @@
-/* Print: the proposal (DESIGN §11). On screen the proposal is hidden. When the page is
+/* Print: the proposal. On screen the proposal is hidden. When the page is
    printed, the app chrome and the plan page are hidden and only the proposal shows, as one A4
    page of light paper colours. These literal colours are the only raw hex values allowed in
    the app: paper is light whatever the screen theme is. */

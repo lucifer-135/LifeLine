@@ -93,7 +93,7 @@ function plural(count: number, one: string, many: string): string {
   return `${count} ${count === 1 ? one : many}`
 }
 
-// The chart's aria-label (DESIGN §9). It describes the whole day, not the part played.
+// The chart's aria-label. It describes the whole day, not the part played.
 export function chartSummary(result: TwinResult): string {
   const outages = gridDownRuns(result.steps)
   const downSteps = outages.reduce((sum, run) => sum + run.end - run.start, 0)

@@ -5,7 +5,7 @@ export interface Stat {
   sourceId: string
 }
 
-// Rendered as `before` + CountUp(`value`) + `after`. Wording is DESIGN.md §6.0.
+// Rendered as `before` + CountUp(`value`) + `after`.
 export const HOME_STATS: Stat[] = [
   {
     before: 'Nigerian hospitals lose grid power for 8 to ',

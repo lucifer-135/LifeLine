@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import './HeroScene.css'
 
 // The home hero: a city and a hospital at night. The grid fails, the city goes
-// dark, and the hospital stays lit because its battery takes over (DESIGN §4.1).
+// dark, and the hospital stays lit because its battery takes over.
 
 // Scene geometry in viewBox units. The SVG uses preserveAspectRatio
 // "xMidYMax slice", so the bottom edge and the horizontal centre always stay in

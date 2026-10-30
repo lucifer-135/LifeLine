@@ -36,7 +36,7 @@ const CONDITION_LABELS: Record<RoomCondition, string | null> = {
 }
 
 // Opacity of the lamp light. The light itself is --lamp at 22% (HospitalMap.css), so a dim
-// room shows 8%, as DESIGN §6.2 asks.
+// room shows 8%.
 const LIGHT: Record<RoomState, number> = { lit: 1, dim: 8 / 22, dark: 0, alarm: 0 }
 const ROOM_SPRING = { type: 'spring', stiffness: 260, damping: 30 } as const
 const INSTANT = { duration: 0 } as const

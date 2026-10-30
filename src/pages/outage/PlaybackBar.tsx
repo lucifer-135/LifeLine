@@ -23,7 +23,7 @@ interface PlaybackBarProps {
 export function PlaybackBar({ playback, lastStep }: PlaybackBarProps) {
   const { step, playing, speed, toggle, setSpeed, seek } = playback
 
-  // Space toggles play while the bar has focus (DESIGN §6.2). Arrow keys move the
+  // Space toggles play while the bar has focus. Arrow keys move the
   // scrubber natively.
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (event.key !== ' ') return

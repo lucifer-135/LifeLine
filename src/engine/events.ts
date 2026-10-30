@@ -12,7 +12,7 @@ export function stepToClock(step: number): string {
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
 }
 
-// Event-log copy. DESIGN.md §8 owns the wording.
+// Event-log copy, shown verbatim in the UI.
 export function formatEvent(e: TwinEvent): string {
   switch (e.kind) {
     case 'grid_lost':

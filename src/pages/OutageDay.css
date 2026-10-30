@@ -1,4 +1,4 @@
-/* Outage day (DESIGN §6.2). Mobile first: one column in reading order (map, runway,
+/* Outage day. Mobile first: one column in reading order (map, runway,
    event log, chart, playback, comparison). From 768px the map sits on the left and the
    runway and event log share the right column. */
 

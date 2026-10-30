@@ -8,10 +8,10 @@ import { HeroScene } from './HeroScene'
 import './Home.css'
 
 // The demo always plays the same hospital on the same day, so the outage judges
-// see is the one the numbers in HANDOFF.md were checked against.
+// see is the one the published demo numbers were checked against.
 const DEMO_PRESET_ID = 'kano-50'
 
-// Copy from DESIGN §6.0. The title is the bold lead of each step.
+// The title is the bold lead of each step.
 const STEPS = [
   {
     title: 'Describe your hospital:',

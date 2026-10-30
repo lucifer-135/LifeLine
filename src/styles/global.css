@@ -1,5 +1,5 @@
-/* Global styles: reset, base type (DESIGN §3), layout, buttons (DESIGN §7),
-   focus, and the CSS motion loops (DESIGN §4). Colours, sizes and spacing come
+/* Global styles: reset, base type, layout, buttons,
+   focus, and the CSS motion loops. Colours, sizes and spacing come
    from tokens.css; component styles live next to their components. */
 
 /* Height of the sticky nav, used for scroll-margin-top so it never covers a
@@ -212,7 +212,7 @@ summary,
   transform: none;
 }
 
-/* Icons: one stroke weight across the app (DESIGN §7). */
+/* Icons: one stroke weight across the app. */
 svg.lucide {
   stroke-width: 1.75;
 }
@@ -270,7 +270,7 @@ svg.lucide {
   cursor: not-allowed;
 }
 
-/* Motion loops (DESIGN §4). Everything else is animated with `motion`. */
+/* Motion loops. Everything else is animated with `motion`. */
 
 /* A room whose life-critical equipment has no power: outline opacity 1 to 0.35
    and back, one cycle every 1.2s. */

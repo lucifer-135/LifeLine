@@ -48,7 +48,7 @@ interface LegendItem {
   storageOnly?: boolean
 }
 
-// Every series, in the order the chart stacks or draws them (DESIGN §9).
+// Every series, in the order the chart stacks or draws them.
 const LEGEND: LegendItem[] = [
   { label: 'Life-critical served', swatch: 'fill', color: 'var(--t1)' },
   { label: 'Essential served', swatch: 'fill', color: 'var(--t2)' },

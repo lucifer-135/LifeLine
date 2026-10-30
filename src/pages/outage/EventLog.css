@@ -1,4 +1,4 @@
-/* Event log (DESIGN §6.2). From 768px it fills the right column under the runway and
+/* Event log. From 768px it fills the right column under the runway and
    scrolls; below that it folds away behind an "Event log (n)" button. */
 
 .event-log {
@@ -103,7 +103,7 @@
     transform: rotate(180deg);
   }
 
-  /* Collapsible: rows 0fr to 1fr (DESIGN §4). Hidden content leaves the tab and
+  /* Collapsible: rows 0fr to 1fr. Hidden content leaves the tab and
      reading order. */
   .event-log__body {
     display: grid;

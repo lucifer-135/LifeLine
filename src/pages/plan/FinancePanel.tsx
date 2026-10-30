@@ -12,7 +12,7 @@ import './FinancePanel.css'
 // cannot be read here.
 const BAR_TRANSITION = { duration: 0.28, ease: [0.22, 1, 0.36, 1] } as const
 
-// The fee slider's range (DESIGN §6.3), in percent.
+// The fee slider's range, in percent.
 const FEE_MIN_PERCENT = 70
 const FEE_MAX_PERCENT = 85
 

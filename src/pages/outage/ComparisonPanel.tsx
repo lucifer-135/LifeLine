@@ -56,7 +56,7 @@ function ComparisonColumn({ modifier, title, metrics }: ColumnProps) {
   )
 }
 
-// The end-of-day line (DESIGN §6.2). It always uses the full-day totals.
+// The end-of-day line. It always uses the full-day totals.
 function Verdict({ baseline, lifeline }: { baseline: TwinMetrics; lifeline: TwinMetrics }) {
   const reduceMotion = useReducedMotion() === true
   const saving = baseline.energyCostNgn - lifeline.energyCostNgn

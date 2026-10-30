@@ -58,7 +58,7 @@ interface ProposalProps {
   finance: FinanceResult
 }
 
-// The one-page summary the browser prints (DESIGN §11). It is hidden on screen and print.css
+// The one-page summary the browser prints. It is hidden on screen and print.css
 // shows it, and only it, when the page is printed.
 export function Proposal({ profile, season, costs, comparison, finance }: ProposalProps) {
   const resultTitleId = useId()

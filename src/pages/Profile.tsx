@@ -223,7 +223,7 @@ export function Profile() {
   const { dailyKwh, peakKw } = useMemo(() => summarize(profile.equipment), [profile.equipment])
 
   // The dock grows when errors appear. Fields need to know its height so that
-  // focus scrolls them clear of it (DESIGN §10: sticky UI never covers a focused control).
+  // focus scrolls them clear of it (sticky UI must never cover a focused control).
   useEffect(() => {
     const page = pageRef.current
     const dock = dockRef.current

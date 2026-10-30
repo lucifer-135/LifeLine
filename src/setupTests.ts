@@ -1,4 +1,11 @@
 import '@testing-library/jest-dom/vitest'
+import { cleanup } from '@testing-library/react'
+import { afterEach } from 'vitest'
+
+// RTL only auto-registers cleanup when a global `afterEach` exists. With
+// `globals: false` there is none, so unmount rendered trees here or DOM leaks
+// from one test into the next.
+afterEach(cleanup)
 
 // jsdom implements none of matchMedia, IntersectionObserver or ResizeObserver.
 // `motion` (useInView, reduced-motion checks) and Recharts (ResponsiveContainer)

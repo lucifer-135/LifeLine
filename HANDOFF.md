@@ -6,8 +6,8 @@ Use this file to resume after compaction or a session limit. **Update it after e
 
 ## Status
 
-- **Last updated:** 2026-10-30, Task 10 complete (cloud build session, subagent-driven).
-- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: Task 11 (Hospital profile page).
+- **Last updated:** 2026-10-30, Task 11 complete; Task 12 in progress (cloud build session, subagent-driven).
+- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: Task 12 (Outage day page). Part A (playback hook, room state, running metrics) is committed; part B (the page) is in progress.
 - **Repo:** GitHub `lucifer-135/LifeLine` (private). Work branch `claude/modest-gauss-c677cd`, draft PR to `main`. Original local clone: `C:\Shivansh\Projects\Global-Energy-Hackathon`.
 - **Files present:**
   - `CLAUDE.md`
@@ -46,7 +46,7 @@ Keep this in sync with PLAN.md.
 | 8 | App shell, state, router, tokens | done | Placeholder pages (named exports) at final paths; Tasks 10–14 replace them. Lint: 2 accepted `only-export-components` warnings on AppState.tsx. |
 | 9 | Shared components | done | CountUp renders the number twice (animated aria-hidden + visually hidden final value). |
 | 10 | Home | done | Browser-checked at 375–1440 px with headless Chromium, including reduced motion. Hero scene in `src/pages/HeroScene.tsx`. Redeploy needs the user. |
-| 11 | Hospital profile | todo | |
+| 11 | Hospital profile | done | Browser-checked 320–1440 px; sticky summary never covers a focused field. Re-picking the selected preset reloads it (discards edits). |
 | 12 | Outage day | todo | demo money shot |
 | 13 | Plan & finance, proposal | todo | |
 | 14 | Method & sources | todo | |

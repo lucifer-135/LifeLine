@@ -61,7 +61,11 @@ function removeAllLifeCritical() {
   }
 }
 
-describe('Profile', () => {
+// Why the longer timeout: each getByLabelText here checks every labelled control in a
+// table of about 160 fields, which costs close to a second in jsdom (the engine run
+// itself takes a few milliseconds). A test with three such queries takes about 2.5 s
+// alone and passed the 5 s default when other test runs shared the CPU.
+describe('Profile', { timeout: 15_000 }, () => {
   test('has one h1 and loads the demo hospital', () => {
     renderProfile()
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1)
@@ -184,6 +188,61 @@ describe('Profile', () => {
     expect(within(rowOf('ICU ventilator')).getByText('Life-critical')).toBeInTheDocument()
     expect(within(rowOf('ICU air conditioner')).getByText('Essential')).toBeInTheDocument()
     expect(within(rowOf('Ward ceiling fan')).getByText('Can wait')).toBeInTheDocument()
+  })
+
+  // On a phone the rows are restyled as blocks, and Safari then drops the table's
+  // semantics. Explicit roles keep it announced as a table with headers and cells.
+  test('the equipment table states its table roles explicitly', () => {
+    renderProfile()
+    const table = screen.getByRole('table')
+    expect(table).toHaveAttribute('role', 'table')
+    const expectRole = (selector: string, role: string) => {
+      const elements = table.querySelectorAll(selector)
+      expect(elements.length).toBeGreaterThan(0)
+      for (const element of elements) expect(element).toHaveAttribute('role', role)
+    }
+    expectRole('thead, tbody', 'rowgroup')
+    expectRole('tr', 'row')
+    expectRole('td', 'cell')
+    expectRole('th[scope="col"]', 'columnheader')
+    expectRole('th[scope="row"], th[scope="rowgroup"]', 'rowheader')
+
+    expect(within(table).getAllByRole('columnheader').map((header) => header.textContent)).toEqual([
+      'Item',
+      'Priority',
+      'Watts',
+      'Duty',
+      'Qty',
+      'Remove',
+    ])
+    expect(within(rowOf('ICU ventilator')).getByRole('rowheader', { name: 'ICU ventilator' })).toBeInTheDocument()
+    expect(within(rowOf('ICU ventilator')).getAllByRole('cell')).toHaveLength(5)
+  })
+
+  // The removed row held focus. Without a new home it would drop to <body>.
+  test('after Remove, focus moves to the next row, else the previous row, else Add equipment', () => {
+    renderProfile()
+    fireEvent.click(screen.getByRole('radio', { name: 'Primary Health Centre, FCT' }))
+    const removeButtons = () => screen.getAllByRole('button', { name: /^Remove / })
+    const buttonName = (button: HTMLElement) => button.getAttribute('aria-label') ?? ''
+
+    const [first, second] = removeButtons()
+    const nextName = buttonName(second)
+    first.focus()
+    fireEvent.click(first)
+    expect(screen.getByRole('button', { name: nextName })).toHaveFocus()
+
+    // The last row has no next row, so focus goes back one.
+    const rows = removeButtons()
+    const previous = rows[rows.length - 2]
+    fireEvent.click(rows[rows.length - 1])
+    expect(previous).toHaveFocus()
+
+    // The last item leaves the empty state, whose add control takes focus.
+    while (removeButtons().length > 1) fireEvent.click(removeButtons()[0])
+    fireEvent.click(removeButtons()[0])
+    expect(screen.queryByRole('table')).not.toBeInTheDocument()
+    expect(screen.getByLabelText('Add equipment')).toHaveFocus()
   })
 
   test('adding from the library adds a row with qty 1 and a unique id', () => {

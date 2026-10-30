@@ -1,10 +1,10 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, onTestFinished, test, vi } from 'vitest'
 import { DEFAULT_COSTS } from '../data/costs'
 import { PRESETS } from '../data/presets'
 import { runComparison } from '../engine/compare'
 import { DEMO_SEED } from '../engine/constants'
-import { stepToClock } from '../engine/events'
+import { formatEvent, stepToClock } from '../engine/events'
 import { partialMetrics } from '../engine/twin'
 import { formatDuration, formatNgn } from '../lib/format'
 import { AppProvider, useApp } from '../state/AppState'
@@ -61,6 +61,21 @@ function runway(): HTMLElement {
 // The ward rooms on the floor plan: buttons whose name is "{Room}: {state}, … kW served".
 function roomButtons(): HTMLElement[] {
   return screen.getAllByRole('button', { name: /kW served$/ })
+}
+
+// A phone-width screen: the query EventLog folds the log at matches, nothing else does.
+function mockNarrowScreen() {
+  const spy = vi.spyOn(window, 'matchMedia').mockImplementation((query) => ({
+    matches: query === '(max-width: 767px)',
+    media: query,
+    onchange: null,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    addListener: () => {},
+    removeListener: () => {},
+    dispatchEvent: () => false,
+  }))
+  onTestFinished(() => spy.mockRestore())
 }
 
 function advance(ms: number) {
@@ -345,6 +360,39 @@ describe('OutageDay', () => {
     expect(toggle).toHaveAttribute('aria-expanded', 'false')
     fireEvent.click(toggle)
     expect(toggle).toHaveAttribute('aria-expanded', 'true')
+    // On a wide screen the list itself announces, so there is no second region.
+    expect(within(log).queryByRole('status')).not.toBeInTheDocument()
+  })
+
+  // On a phone the list is folded away (hidden from assistive tech), so it cannot
+  // announce. A hidden region outside the fold reads out each new step's events, and
+  // the list stays quiet so an opened log is not read twice.
+  test('on a phone a hidden region announces the newest events and the list stays quiet', () => {
+    mockNarrowScreen()
+    renderOutage()
+    const log = screen.getByRole('region', { name: 'Event log' })
+    const list = within(log).getByRole('list')
+    const announcer = within(log).getByRole('status')
+    expect(announcer).toHaveAttribute('aria-live', 'polite')
+    expect(announcer).toHaveClass('visually-hidden')
+    expect(list).not.toHaveAttribute('aria-live')
+    expect(announcer).toHaveTextContent(/^$/)
+
+    // Several events can share a step (the grid goes and loads are paused at once).
+    seek(firstOutageStep)
+    const atOutage = demo.lifeline.events.filter((event) => event.step === firstOutageStep)
+    expect(atOutage.length).toBeGreaterThan(1)
+    expect(announcer).toHaveTextContent(
+      `${stepToClock(firstOutageStep)} ${atOutage.map((event) => formatEvent(event)).join(' ')}`,
+    )
+
+    seek(95)
+    const last = demo.lifeline.events[demo.lifeline.events.length - 1]
+    expect(announcer).toHaveTextContent(`${stepToClock(last.step)} Grid power is back.`)
+    expect(announcer).not.toHaveTextContent('Grid lost')
+
+    fireEvent.click(within(log).getByRole('button', { name: /^Event log \(/ }))
+    expect(list).not.toHaveAttribute('aria-live')
   })
 
   test('New day picks a new seed and goes back to 00:00; the season does not', () => {

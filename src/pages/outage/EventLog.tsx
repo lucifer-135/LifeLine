@@ -1,6 +1,6 @@
 import { ChevronDown, TriangleAlert } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
-import { useId, useState } from 'react'
+import { useId, useState, useSyncExternalStore } from 'react'
 import { formatEvent, stepToClock } from '../../engine/events'
 import type { TwinEvent, TwinEventKind } from '../../engine/types'
 import './EventLog.css'
@@ -19,6 +19,28 @@ const RESTORE_KINDS: ReadonlySet<TwinEventKind> = new Set([
 // --dur-base with --ease-out.
 const ENTER = { duration: 0.28, ease: [0.22, 1, 0.36, 1] } as const
 
+// Below 768px the log folds away behind its button (EventLog.css, same breakpoint).
+const FOLDED_QUERY = '(max-width: 767px)'
+
+function subscribeToFolded(onChange: () => void): () => void {
+  const query = window.matchMedia(FOLDED_QUERY)
+  query.addEventListener('change', onChange)
+  return () => query.removeEventListener('change', onChange)
+}
+
+function isFolded(): boolean {
+  return window.matchMedia(FOLDED_QUERY).matches
+}
+
+// What the phone announcer reads: the time, then every event of the latest step with
+// events, oldest first (losing the grid and pausing loads can happen in the same step).
+function announcementFor(happened: TwinEvent[]): string {
+  const latest = happened.at(-1)
+  if (!latest) return ''
+  const messages = happened.filter((event) => event.step === latest.step).map(formatEvent)
+  return `${stepToClock(latest.step)} ${messages.join(' ')}`
+}
+
 function entryClass(kind: TwinEventKind): string {
   if (ALARM_KINDS.has(kind)) return 'event-log__entry event-log__entry--alarm'
   if (RESTORE_KINDS.has(kind)) return 'event-log__entry event-log__entry--restore'
@@ -34,6 +56,7 @@ interface EventLogProps {
 // it folds away behind its heading, so the chart is not pushed far down the page.
 export function EventLog({ events, step }: EventLogProps) {
   const reduceMotion = useReducedMotion() === true
+  const folded = useSyncExternalStore(subscribeToFolded, isFolded)
   const [open, setOpen] = useState(false)
   const titleId = useId()
   const bodyId = useId()
@@ -59,8 +82,16 @@ export function EventLog({ events, step }: EventLogProps) {
           <ChevronDown className="event-log__chevron" size={20} />
         </button>
       </h2>
+      {/* A folded log is hidden from assistive tech, so it cannot announce. This region
+          sits outside the fold and speaks for it; the list then stays quiet, so an opened
+          log is not read twice. */}
+      {folded ? (
+        <p className="visually-hidden" role="status" aria-live="polite">
+          {announcementFor(happened)}
+        </p>
+      ) : null}
       <div id={bodyId} className="event-log__body">
-        <ol className="event-log__list" aria-live="polite">
+        <ol className="event-log__list" aria-live={folded ? undefined : 'polite'}>
           {shown.map((event) => (
             <motion.li
               key={`${event.step}-${event.kind}`}

@@ -65,7 +65,8 @@ export function Home() {
 
       <section className="container home-section" aria-labelledby="home-why">
         <h2 id="home-why">Why it matters</h2>
-        <ul className="home-stats">
+        {/* The explicit role keeps list semantics in Safari, which drops them with list-style: none. */}
+        <ul className="home-stats" role="list">
           {HOME_STATS.map((stat) => (
             <li key={stat.sourceId}>
               {stat.before}
@@ -87,7 +88,7 @@ export function Home() {
 
       <section className="container home-section" aria-labelledby="home-how">
         <h2 id="home-how">How it works</h2>
-        <ol className="home-steps">
+        <ol className="home-steps" role="list">
           {STEPS.map((step, i) => (
             <li key={step.title} className="home-steps__step">
               {/* The list already numbers the steps for screen readers. */}

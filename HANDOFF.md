@@ -6,8 +6,8 @@ Use this file to resume after compaction or a session limit. **Update it after e
 
 ## Status
 
-- **Last updated:** 2026-10-30, Task 6 complete (cloud build session, subagent-driven).
-- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: Task 7 (finance and formatters).
+- **Last updated:** 2026-10-30, Task 7 complete; engine done (cloud build session, subagent-driven).
+- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: Task 8 (app shell, state, router, tokens).
 - **Repo:** GitHub `lucifer-135/LifeLine` (private). Work branch `claude/modest-gauss-c677cd`, draft PR to `main`. Original local clone: `C:\Shivansh\Projects\Global-Energy-Hackathon`.
 - **Files present:**
   - `CLAUDE.md`
@@ -40,7 +40,7 @@ Keep this in sync with PLAN.md.
 | 4 | Sizing | done | kano-50, seed 2026: battery 85 kWh, PV 41 kWp, inverter 12 kW (longest outage 7.5 h). |
 | 5 | Twin: Lifeline | done | kano-50 seed 2026: life-critical 0 min dark, essential 0 min, 0 L diesel, 109.9 kWh grid, ₦23,017/day. Fuzz-checked energy balance. |
 | 6 | Twin: baseline, comparison, event copy | done | kano-50 seed 2026: today 315 min life-critical dark, 50 L, ₦179K/day; Lifeline 0 min, 0 L, ₦23K. Baseline runway divides fuel by the whole load (it never sheds). |
-| 7 | Finance and formatters | todo | |
+| 7 | Finance and formatters | done | kano-50: capex ₦44.1M, fee ₦4.6M/mo, hospital saves ₦13.7M/yr, payback 1.0 yrs, IRR 103%, CO₂ avoided 43 t/yr. |
 | 8 | App shell, state, router, tokens | todo | |
 | 9 | Shared components | todo | |
 | 10 | Home | todo | |
@@ -198,4 +198,5 @@ Do not cite the Kano hospital's system size: one source says a 7 MW solar projec
 
 - **Fonts.** If "Atkinson Hyperlegible Next" is not on Google Fonts, fall back to "Atkinson Hyperlegible" (DESIGN.md §3).
 - **Judging criteria are unknown.** The design covers the likely axes: impact, feasibility, innovation, the demo, business model and scalability.
+- **Provider return looks very rich.** At ₦3,277/L the kano-50 case pays back in 1.0 years with a 103% IRR. Judges may question it; the diesel price sensitivity below is the answer.
 - **Diesel price spike.** The finance case is very strong at ₦3,277/L, and judges may question it. Show it as editable, and mention the February price of ₦1,420 as a sensitivity case.

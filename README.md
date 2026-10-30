@@ -33,8 +33,13 @@ With the default settings (General Hospital, Kano, 50 beds, a typical day), the 
 - **Today: diesel only.** Life-critical equipment goes 5h 15m without power during the day.
 - **With Lifeline.** 0 minutes without power, and ₦156K saved that day.
 - **Plan.** 41 kWp of solar, 85 kWh of lithium (LFP) storage and a 12 kW inverter. At a fee of 80% of today's spend, the hospital saves ₦13.7M a year.
+- **For the investor.** ₦44.1M upfront, paid back in about 1 year, with a 103% annual return over a 10-year contract.
 
 All figures come from the model in `src/engine/` at the default assumptions, which you can change on the profile and plan pages.
+
+### If diesel gets cheaper
+
+The finance case is driven mostly by diesel, which the default prices at ₦3,277 per litre (NBS, May 2026). At the February 2026 NBS average of ₦1,420 per litre, the same hospital still saves ₦6.9M a year. The investor's payback grows to 2.4 years and the return falls to 40% a year. Life-critical care stays powered at either price, because the price does not change the system size or the controller. To check another price, edit "Diesel price" under Assumptions on the plan page.
 
 ## How to run
 
@@ -49,6 +54,13 @@ npm run build    # type-check and build the static site into dist/
 ```
 
 There is no backend. Every calculation runs in the browser, so the built `dist/` folder can be served from any static host.
+
+To deploy on Vercel:
+
+```bash
+npx vercel          # first time only: log in and link the project
+npx vercel --prod   # build and publish
+```
 
 ## Method in short
 

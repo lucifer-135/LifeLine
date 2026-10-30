@@ -6,6 +6,14 @@ import './RunwayGauge.css'
 
 // Under two hours of cover the runway turns to the warning colour (DESIGN §6.2).
 const WARN_BELOW_MIN = 120
+// Beyond this the exact figure means little, and with almost no life-critical load the
+// engine's runway grows towards billions of hours.
+const CAP_MIN = 99 * 60
+const EPS = 1e-9
+
+function formatRunway(minutes: number): string {
+  return minutes > CAP_MIN ? 'over 99h' : formatDuration(minutes)
+}
 
 interface RunwayGaugeProps {
   twinStep: TwinStep
@@ -16,7 +24,9 @@ interface RunwayGaugeProps {
 // the event log announces the changes, so this would only repeat them.
 export function RunwayGauge({ twinStep, hasBattery }: RunwayGaugeProps) {
   const unpowered = !twinStep.gridUp && isUnderServed(twinStep, 'T1')
-  const covered = !twinStep.gridUp && !unpowered
+  // Nothing life-critical is switched on, so there is no ICU runway to speak of.
+  const noLoad = !twinStep.gridUp && !unpowered && twinStep.loadKw.T1 <= EPS
+  const covered = !twinStep.gridUp && !unpowered && !noLoad
   const warn = covered && twinStep.t1RunwayMin < WARN_BELOW_MIN
 
   return (
@@ -35,10 +45,11 @@ export function RunwayGauge({ twinStep, hasBattery }: RunwayGaugeProps) {
             ICU without power
           </p>
         )}
+        {noLoad && <p className="runway__status runway__status--idle">No life-critical load now</p>}
         {covered && (
           <>
             <p className="runway__label">ICU covered for</p>
-            <p className="live-number live-number--runway runway__value">{formatDuration(twinStep.t1RunwayMin)}</p>
+            <p className="live-number live-number--runway runway__value">{formatRunway(twinStep.t1RunwayMin)}</p>
           </>
         )}
       </div>

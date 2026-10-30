@@ -39,14 +39,21 @@ export function isUnderServed(step: TwinStep, tier: Tier): boolean {
 // or once the fuel runs out. Counting under-served load as off makes its rooms go dark
 // too, so the map tells the same story as the numbers.
 export function isTierOff(step: TwinStep, tier: Tier): boolean {
-  if (tier === 'T2' && step.shedT2) return true
-  if (tier === 'T3' && step.shedT3) return true
-  return isUnderServed(step, tier)
+  return isTierShed(step, tier) || isUnderServed(step, tier)
+}
+
+// Paused on purpose by the controller, as opposed to under-served for want of power.
+export function isTierShed(step: TwinStep, tier: Tier): boolean {
+  if (tier === 'T2') return step.shedT2
+  if (tier === 'T3') return step.shedT3
+  return false
 }
 
 // Light state of a room at one step. Only equipment switched on by its schedule counts,
 // because a theatre at 02:00 has no load to lose. The service is judged per tier, not
-// per item, since the twin tracks served kW by tier for the whole hospital.
+// per item, since the twin tracks served kW by tier for the whole hospital. A room with
+// nothing switched on shows whether the hospital has power at all: lamp light only ever
+// means power is delivered, so it goes dark while life-critical load is under-served.
 export function roomState(
   ward: Wards,
   step: number,
@@ -55,9 +62,9 @@ export function roomState(
 ): RoomState {
   const hour = Math.floor(step / STEPS_PER_HOUR)
   const active = itemsIn(ward, profile).filter((item) => item.scheduleMask[hour])
-  if (active.length === 0) return 'lit'
-
   const twinStep = result.steps[step]
+  if (active.length === 0) return isUnderServed(twinStep, 'T1') ? 'dark' : 'lit'
+
   if (active.some((item) => item.tier === 'T1') && isUnderServed(twinStep, 'T1')) return 'alarm'
 
   const off = active.filter((item) => isTierOff(twinStep, item.tier)).length

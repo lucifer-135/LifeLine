@@ -105,6 +105,13 @@
   fill: var(--alarm);
 }
 
+/* Without power but not life-critical: plain text, bold, no alarm colour or outline. */
+.map-room--no-power:not(.map-room--alarm) .map-room__status,
+.map-room--partly-powered .map-room__status {
+  font-weight: 700;
+  fill: var(--text);
+}
+
 /* Roof array: each panel's fill is the share of rated solar output (inline style). */
 
 .map-roof__panel {

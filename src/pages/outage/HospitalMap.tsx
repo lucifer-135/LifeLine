@@ -6,7 +6,8 @@ import { TierBadge } from '../../components/TierBadge'
 import type { Equipment, HospitalProfile, TwinResult, TwinStep } from '../../engine/types'
 import { NARROW_LAYOUT, WARD_ROOMS, WIDE_LAYOUT, wallPath } from './mapLayout'
 import type { MapLayout, PlanRoom, WardRoom, WardRoomId } from './mapLayout'
-import { ITEM_STATUS_TEXT, itemKw, itemStatus, roomServedKw } from './roomDetails'
+import { ITEM_STATUS_TEXT, itemKw, itemStatus, roomCondition, roomServedKw } from './roomDetails'
+import type { RoomCondition } from './roomDetails'
 import { itemsIn, roomState } from './roomState'
 import type { RoomState } from './roomState'
 import './HospitalMap.css'
@@ -15,17 +16,22 @@ import './HospitalMap.css'
 // so the map switches to the two-column plan.
 const WIDE_MIN_PX = 552
 
-// How each state is spoken (room button) and written on the plan.
-const STATE_WORDS: Record<RoomState, string> = {
+// How each condition is spoken (room button) and written on the plan. The words name the
+// cause: "Paused" only when the controller shed the load on purpose.
+const CONDITION_WORDS: Record<RoomCondition, string> = {
   lit: 'lit',
-  dim: 'partly paused',
-  dark: 'paused',
+  'partly-paused': 'partly paused',
+  paused: 'paused',
+  'partly-powered': 'partly powered',
+  'no-power': 'no power',
   alarm: 'no power',
 }
-const STATE_LABELS: Record<RoomState, string | null> = {
+const CONDITION_LABELS: Record<RoomCondition, string | null> = {
   lit: null,
-  dim: 'Partly paused',
-  dark: 'Paused',
+  'partly-paused': 'Partly paused',
+  paused: 'Paused',
+  'partly-powered': 'Partly powered',
+  'no-power': 'No power',
   alarm: 'No power',
 }
 
@@ -87,14 +93,15 @@ interface MapRoomProps {
   room: WardRoom
   plan: PlanRoom
   state: RoomState
+  condition: RoomCondition
   servedKw: number
   open: boolean
   onToggle: () => void
 }
 
-function MapRoom({ room, plan, state, servedKw, open, onToggle }: MapRoomProps) {
+function MapRoom({ room, plan, state, condition, servedKw, open, onToggle }: MapRoomProps) {
   const reduceMotion = useReducedMotion() === true
-  const label = STATE_LABELS[state]
+  const label = CONDITION_LABELS[condition]
   const { x, y, width, height } = plan
 
   function handleKeyDown(event: KeyboardEvent<SVGGElement>) {
@@ -105,11 +112,11 @@ function MapRoom({ room, plan, state, servedKw, open, onToggle }: MapRoomProps) 
 
   return (
     <g
-      className={`map-room map-room--${state}`}
+      className={`map-room map-room--${state} map-room--${condition}`}
       data-room={room.id}
       role="button"
       tabIndex={0}
-      aria-label={`${room.name}: ${STATE_WORDS[state]}, ${servedKw.toFixed(1)} kW served`}
+      aria-label={`${room.name}: ${CONDITION_WORDS[condition]}, ${servedKw.toFixed(1)} kW served`}
       aria-haspopup="dialog"
       aria-expanded={open}
       onClick={onToggle}
@@ -362,6 +369,8 @@ export function HospitalMap({ profile, result, step, pvKwp }: HospitalMapProps) 
 
   return (
     <div ref={containerRef} className="hospital-map">
+      {/* Gives the popover's room heading (h3) its parent level. */}
+      <h2 className="visually-hidden">Hospital map</h2>
       <svg
         className="hospital-map__plan"
         viewBox={`0 0 ${layout.width} ${layout.height}`}
@@ -370,22 +379,28 @@ export function HospitalMap({ profile, result, step, pvKwp }: HospitalMapProps) 
       >
         <RoofArray layout={layout} solarShare={solarShare} hasSolar={withLifeline} />
         <GridCable layout={layout} gridUp={twinStep.gridUp} />
-        {rooms.map(({ room, items }) => (
-          <MapRoom
-            key={room.id}
-            room={room}
-            plan={layout.rooms[room.id]}
-            state={roomState(room.wards, step, result, profile)}
-            servedKw={roomServedKw(items, step, twinStep)}
-            open={openRoom === room.id}
-            onToggle={() => toggleRoom(room.id)}
-          />
-        ))}
+        {rooms.map(({ room, items }) => {
+          const state = roomState(room.wards, step, result, profile)
+          return (
+            <MapRoom
+              key={room.id}
+              room={room}
+              plan={layout.rooms[room.id]}
+              state={state}
+              condition={roomCondition(state, items, step, twinStep)}
+              servedKw={roomServedKw(items, step, twinStep)}
+              open={openRoom === room.id}
+              onToggle={() => toggleRoom(room.id)}
+            />
+          )
+        })}
         <BatteryRoom plan={layout.battery} soc={twinStep.soc} hasBattery={withLifeline} />
         <GeneratorRoom plan={layout.generator} running={twinStep.dieselKw > 0} />
       </svg>
       {open && (
+        // Keyed by room, so opening another room mounts a new popover that takes focus.
         <RoomPopover
+          key={open.room.id}
           room={open.room}
           plan={layout.rooms[open.room.id]}
           layout={layout}

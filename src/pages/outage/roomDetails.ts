@@ -1,6 +1,7 @@
 import { STEPS_PER_DAY } from '../../engine/constants'
 import type { Equipment, Tier, TwinStep } from '../../engine/types'
-import { isTierOff, isUnderServed } from './roomState'
+import { isTierShed, isUnderServed } from './roomState'
+import type { RoomState } from './roomState'
 
 // What the room popover says about one item at one step.
 export type ItemStatus = 'powered' | 'paused' | 'no-power' | 'idle'
@@ -24,13 +25,28 @@ function isScheduled(item: Equipment, step: number): boolean {
   return item.scheduleMask[Math.floor(step / STEPS_PER_HOUR)] === true
 }
 
-// The status follows the same rules as the room's light (roomState): a life-critical item
-// is "No power" when its tier is under-served; any other tier is "Paused" when it is shed
-// or under-served.
+// What the room popover says about an item. The cause decides the word: a tier the
+// controller shed is "Paused"; a tier under-served without being shed (diesel-only
+// blackout, fuel out, a flat battery) has "No power".
 export function itemStatus(item: Equipment, step: number, twinStep: TwinStep): ItemStatus {
   if (!isScheduled(item, step)) return 'idle'
-  if (item.tier === 'T1' && isUnderServed(twinStep, 'T1')) return 'no-power'
-  return isTierOff(twinStep, item.tier) ? 'paused' : 'powered'
+  if (isTierShed(twinStep, item.tier)) return 'paused'
+  return isUnderServed(twinStep, item.tier) ? 'no-power' : 'powered'
+}
+
+// The room's state with its cause, which sets the label on the plan and the words in the
+// room's name. Only life-critical load raises the alarm; other loads without power read
+// "No power" or "Partly powered". When some loads are paused and others lost power, the
+// lost power is the one to report.
+export type RoomCondition = 'lit' | 'partly-paused' | 'paused' | 'partly-powered' | 'no-power' | 'alarm'
+
+export function roomCondition(state: RoomState, items: Equipment[], step: number, twinStep: TwinStep): RoomCondition {
+  if (state === 'lit' || state === 'alarm') return state
+  const statuses = items.map((item) => itemStatus(item, step, twinStep))
+  // A dark room with nothing switched on is dark because the hospital has no power.
+  const unpowered = statuses.includes('no-power') || statuses.every((status) => status === 'idle')
+  if (state === 'dark') return unpowered ? 'no-power' : 'paused'
+  return unpowered ? 'partly-powered' : 'partly-paused'
 }
 
 // The twin serves load per tier for the whole hospital, so a room's share of a tier is

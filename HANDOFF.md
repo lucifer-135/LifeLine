@@ -6,8 +6,8 @@ Use this file to resume after compaction or a session limit. **Update it after e
 
 ## Status
 
-- **Last updated:** 2026-10-30, Task 2 complete (cloud build session, subagent-driven).
-- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: Task 3 (load profile, solar shape, grid pattern).
+- **Last updated:** 2026-10-30, Task 3 complete (cloud build session, subagent-driven).
+- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: Task 4 (sizing).
 - **Repo:** GitHub `lucifer-135/LifeLine` (private). Work branch `claude/modest-gauss-c677cd`, draft PR to `main`. Original local clone: `C:\Shivansh\Projects\Global-Energy-Hackathon`.
 - **Files present:**
   - `CLAUDE.md`
@@ -36,7 +36,7 @@ Keep this in sync with PLAN.md.
 |---|---|---|---|
 | 1 | Scaffold, git, test runner, deploy | done | Vercel deploy skipped: needs the user. oxlint is the template linter. |
 | 2 | Engine types, data, validation | done | 53 SOURCES rows (cost, stat, solar, equip, site). Engine constants have no source rows; the Method page explains them. |
-| 3 | Loads, solar shape, grid pattern | todo | |
+| 3 | Loads, solar shape, grid pattern | done | kano-50: life-critical 109.8, essential 90.3, can wait 98.1 kWh/day (298 total). |
 | 4 | Sizing | todo | |
 | 5 | Twin: Lifeline | todo | |
 | 6 | Twin: baseline, comparison, event copy | todo | |

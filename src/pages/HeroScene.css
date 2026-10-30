@@ -1,0 +1,135 @@
+/* Home hero scene (DESIGN §6.0, motion §4.1). Lamp light only means "power
+   delivered": city windows before the outage, hospital windows throughout. */
+
+.hero-scene {
+  /* Matches the viewBox ratio (260 / 1440) at full width, capped so a very wide
+     screen does not crop the hospital sign. */
+  --scene-h: clamp(200px, 18.06vw, 480px);
+  /* px per scene unit. The SVG scales like preserveAspectRatio "slice": by the
+     larger of width / 1440 and height / 260. */
+  --scene-scale: max(100cqw / 1440, var(--scene-h) / 260);
+  position: relative;
+  height: var(--scene-h);
+  container-type: inline-size;
+  overflow: hidden;
+}
+
+.hero-scene__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-scene__block {
+  fill: var(--night-900);
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.hero-scene__window {
+  fill: var(--night-800);
+}
+
+/* City windows are powered but are not rooms we keep lit, so no glow. */
+.hero-scene__window--lit {
+  fill: var(--lamp);
+  fill-opacity: 0.7;
+}
+
+.hero-scene__pole {
+  stroke: var(--line-strong);
+  stroke-width: 3;
+}
+
+.hero-scene__cable {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 2;
+}
+
+.hero-scene__cable--flow {
+  stroke: var(--grid);
+}
+
+.hero-scene__panel {
+  fill: var(--night-700);
+  stroke: var(--solar);
+  stroke-width: 1.25;
+  stroke-linejoin: round;
+}
+
+/* The "H" hospital sign, never a red cross (DESIGN §1). */
+.hero-scene__sign {
+  fill: var(--night-700);
+  stroke: var(--text);
+  stroke-width: 1.5;
+}
+
+.hero-scene__sign-letter {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 3.5;
+}
+
+.hero-scene__hospital {
+  fill: var(--night-800);
+  stroke: var(--line-strong);
+  stroke-width: 1.5;
+}
+
+.hero-scene__door {
+  fill: var(--night-700);
+}
+
+/* Lit hospital windows are the only glowing part of the scene. */
+.hero-scene__hospital-lit {
+  fill: var(--lamp);
+  filter: drop-shadow(0 0 6px var(--lamp-glow));
+}
+
+.hero-scene__battery {
+  fill: var(--night-800);
+  stroke: var(--battery);
+  stroke-width: 1.5;
+}
+
+.hero-scene__battery-charge {
+  fill: var(--battery);
+}
+
+.hero-scene__ground {
+  fill: var(--night-900);
+}
+
+.hero-scene__street {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+/* Sits on the street, starting under the hospital's left wall (scene x 610,
+   110 units left of the centre at x 720). */
+.hero-scene__caption {
+  position: absolute;
+  left: calc(50% - 110 * var(--scene-scale));
+  bottom: calc(24 * var(--scene-scale));
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  max-width: none;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--text);
+  white-space: nowrap;
+  transform: translateY(50%);
+}
+
+/* A battery status light, matching the battery in the scene. */
+.hero-scene__caption::before {
+  content: '';
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--battery);
+}

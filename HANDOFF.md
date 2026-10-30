@@ -6,8 +6,8 @@ Use this file to resume after compaction or a session limit. **Update it after e
 
 ## Status
 
-- **Last updated:** 2026-10-30, Task 14 complete; Task 15 in progress (cloud build session, subagent-driven).
-- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: Task 15 (polish, accessibility, README), then the whole-branch review, the agreed history rewrite, and PR ready.
+- **Last updated:** 2026-10-30, All 15 PLAN tasks complete; whole-branch review in progress (cloud build session, subagent-driven).
+- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: whole-branch review and its fix wave, the agreed history rewrite, then PR ready for review. After that: Vercel deploy (needs the user), demo video, submission.
 - **Repo:** GitHub `lucifer-135/LifeLine` (private). Work branch `claude/modest-gauss-c677cd`, draft PR to `main`. Original local clone: `C:\Shivansh\Projects\Global-Energy-Hackathon`.
 - **Files present:**
   - `CLAUDE.md`
@@ -50,7 +50,7 @@ Keep this in sync with PLAN.md.
 | 12 | Outage day | done | Browser-checked: 16× median step 25.5 ms; no timer leaks on leave/return; no NaN/tier codes in the DOM; room labels follow cause (Paused = Lifeline shed, No power = unserved). Bundle 825 kB (Recharts) — build warning only. |
 | 13 | Plan & finance, proposal | done | Proposal prints to exactly 1 A4 page (checked with headless Chromium PDF). Cost errors stay fixable on the Plan page. |
 | 14 | Method & sources | done | Formulas and controller text checked against the engine. Anchor links land below the sticky nav (re-scroll after web fonts load). |
-| 15 | Polish, a11y, README, deploy | todo | |
+| 15 | Polish, a11y, README, deploy | done (deploy needs the user) | 467 tests stable over 6 runs. Demo path walked on the local production build: Home→Outage 431 ms, 16× day in 2.7 s, Plan, 1-page A4 proposal, no console errors. README + docs/screenshot-outage-day.png. |
 | — | Demo video and submission | todo | not code |
 
 ---

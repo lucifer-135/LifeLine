@@ -6,7 +6,7 @@ import { generateGridPattern } from './grid'
 import { buildLoadProfile } from './loads'
 import { sizeSystem } from './sizing'
 import { computeMetrics, runTwin, type TwinInput } from './twin'
-import type { HospitalProfile, LoadProfile, TwinResult, TwinStep } from './types'
+import type { HospitalProfile, LoadProfile, TierKw, TwinResult, TwinStep } from './types'
 
 function presetById(id: string): HospitalProfile {
   const preset = PRESETS.find((p) => p.id === id)
@@ -135,8 +135,9 @@ test('sheds can-wait and essential when the battery cannot cover the outage, the
 
 test('essential load stays on when battery plus diesel can carry it; can-wait pauses on battery alone', () => {
   // Battery avail 9.11 kWh < need(T1+T2) 10 kWh, but the generator can deliver
-  // min(20 L / 0.3 L per kWh, 10 kW x 5 h) = 50 kWh before the grid returns, so essential
-  // load stays on. need(all) 15 kWh > 9.11 kWh of battery, so can-wait load still pauses.
+  // min(20 L / 0.3 L per kWh - 5 kWh life-critical still needs today, 10 kW x 5 h) = 50 kWh
+  // before the grid returns, so essential load stays on. need(all) 15 kWh > 9.11 kWh of
+  // battery, so can-wait load still pauses.
   // At 2 kW the battery reaches its reserve after 18 steps; diesel takes over at step 88.
   const r = handBuilt({ generatorKw: 10, fuelLitresPerDay: 20 })
   expect(r.events.map((e) => [e.step, e.kind])).toEqual([
@@ -173,32 +174,71 @@ test('without a generator or without fuel, essential load pauses on battery alon
   }
 })
 
-test('essential load pauses when even battery plus diesel cannot carry it', () => {
-  // Fuel-limited: 0.2 L is 0.67 kWh, so 9.11 + 0.67 = 9.77 kWh < 10 kWh and essential
-  // pauses. Each T1-only step uses 0.25 kWh, and essential returns at step 78
-  // (6 < 0.8 x 7.77), two steps earlier than on battery alone.
-  const fuelLimited = handBuilt({ generatorKw: 10, fuelLitresPerDay: 0.2 })
+test('diesel counts for essential load only if the generator alone could carry life-critical load', () => {
+  const batteryOnly = handBuilt()
+  const eventPairs = (r: TwinResult) => r.events.map((e) => [e.step, e.kind])
+  const cases: [string, Partial<TwinInput>][] = [
+    // 0.5 kW cannot carry the 1 kW life-critical load, so it would lean on the battery.
+    ['generator below the life-critical load', { generatorKw: 0.5, fuelLitresPerDay: 20 }],
+    // 1 L is 3.3 kWh, short of the 5 kWh life-critical load needs during the outage.
+    ['a day of fuel below a day of life-critical load', { generatorKw: 10, fuelLitresPerDay: 1 }],
+  ]
+  for (const [name, over] of cases) {
+    const r = handBuilt(over)
+    expect(r.steps.map((s) => [s.shedT2, s.shedT3]), name).toEqual(
+      batteryOnly.steps.map((s) => [s.shedT2, s.shedT3]),
+    )
+    expect(eventPairs(r), name).toEqual(eventPairs(batteryOnly))
+    expect(r.metrics, name).toEqual(batteryOnly.metrics)
+  }
+})
+
+function tieredLoad(kw: TierKw): LoadProfile {
+  const day = (value: number): number[] => Array<number>(96).fill(value)
+  return {
+    kw: { T1: day(kw.T1), T2: day(kw.T2), T3: day(kw.T3) },
+    dailyKwh: { T1: kw.T1 * 24, T2: kw.T2 * 24, T3: kw.T3 * 24 },
+    peakKw: { ...kw },
+  }
+}
+
+test('essential load pauses when even battery plus spare diesel cannot carry it', () => {
+  // Fuel-limited: 1.65 L is 5.5 kWh, and life-critical load still needs 5 kWh today, so
+  // only 0.5 kWh is spare: 9.11 + 0.5 = 9.61 kWh < 10 kWh and essential pauses. Each
+  // life-critical-only step moves 0.25 kWh from battery to spare fuel, so the total stays
+  // 9.61 kWh; essential returns at step 75 (7.5 < 0.8 x 9.61). The battery then lasts to
+  // the end of the outage, so no diesel burns.
+  const fuelLimited = handBuilt({ generatorKw: 10, fuelLitresPerDay: 1.65 })
   expect(fuelLimited.events.map((e) => [e.step, e.kind])).toEqual([
     [70, 'grid_lost'],
     [70, 'shed_t3'],
     [70, 'shed_t2'],
-    [78, 'restore_t2'],
-    [88, 'restore_t3'],
+    [75, 'restore_t2'],
     [90, 'grid_restored'],
+    [90, 'restore_t3'],
   ])
-  expect(fuelLimited.metrics.t2MinutesUnpowered).toBe(8 * 15)
+  expect(fuelLimited.metrics.t2MinutesUnpowered).toBe(5 * 15)
+  expect(fuelLimited.metrics.dieselLitres).toBe(0)
 
-  // Rating-limited: a 0.1 kW generator delivers at most 0.1 kW x 5 h = 0.5 kWh before the
-  // grid returns, however much fuel is left. 9.11 + 0.5 = 9.61 kWh < 10 kWh, so essential
-  // pauses, and returns at step 79 (5.5 < 0.8 x (6.86 + 0.28)).
-  const ratingLimited = handBuilt({ generatorKw: 0.1, fuelLitresPerDay: 20 })
+  // Rating-limited: 0.2 kW life-critical, 3 kW essential, 1 kW can wait. A 1 kW generator
+  // delivers at most 1 kW x 5 h = 5 kWh before the grid returns, however much fuel is
+  // left: 9.11 + 5 = 14.11 kWh < need(T1+T2) 16 kWh, so essential pauses. Each paused step
+  // costs 0.05 kWh of battery and 0.25 kWh of generator time, and essential returns at
+  // step 79 (8.8 < 0.8 x (8.66 + 2.75)). The battery reaches its reserve at step 89.
+  const ratingLimited = handBuilt({
+    load: tieredLoad({ T1: 0.2, T2: 3, T3: 1 }),
+    generatorKw: 1,
+    fuelLitresPerDay: 20,
+  })
   expect(ratingLimited.events.map((e) => [e.step, e.kind])).toEqual([
     [70, 'grid_lost'],
     [70, 'shed_t3'],
     [70, 'shed_t2'],
     [79, 'restore_t2'],
-    [87, 'restore_t3'],
+    [89, 'diesel_on'],
     [90, 'grid_restored'],
+    [90, 'restore_t3'],
+    [90, 'diesel_off'],
   ])
   expect(ratingLimited.metrics.t2MinutesUnpowered).toBe(9 * 15)
   for (const r of [fuelLimited, ratingLimited]) expect(r.metrics.t1MinutesUnpowered).toBe(0)

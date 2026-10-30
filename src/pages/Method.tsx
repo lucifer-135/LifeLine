@@ -101,8 +101,8 @@ export function Method() {
           <h1>Method & sources</h1>
           <p>
             How Lifeline turns a hospital’s equipment list into a system size, a day of
-            outages and a monthly fee. Every sourced default value is listed with its source and
-            date, and the model settings are explained where they are used.
+            outages and a monthly fee. Every sourced default value is listed with its source, and
+            its date where known. The model settings are explained where they are used.
           </p>
         </header>
 
@@ -162,8 +162,10 @@ export function Method() {
             <li>
               Loads that can wait are paused first, whenever the battery alone cannot carry
               everything. Before pausing essential loads, the controller also counts the diesel the
-              generator can supply until the grid returns or the sun is strong. Paused loads come
-              back only when there is a 20% margin. Life-critical load is never paused.
+              generator can supply until the grid returns or the sun is strong. It counts only
+              fuel that life-critical load will not need for the rest of the day, and only if the
+              generator and a day’s fuel could carry life-critical load on their own. Paused loads
+              come back only when there is a 20% margin. Life-critical load is never paused.
             </li>
             <li>
               Power comes from solar first, then the battery down to its reserve, then the

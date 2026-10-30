@@ -1,0 +1,42 @@
+/* What to install (DESIGN §6.3): datasheet rows separated by hairlines. */
+
+.size-rows {
+  margin: 0;
+  border-top: 1px solid var(--line);
+}
+
+.size-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: var(--s-1) var(--s-4);
+  padding-block: var(--s-4);
+  border-bottom: 1px solid var(--line);
+}
+
+.size-row__label {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: var(--fs-md);
+  font-weight: 700;
+}
+
+.size-row__label svg {
+  color: var(--lamp);
+}
+
+.size-row__value {
+  margin: 0;
+  font-size: var(--fs-2xl);
+  line-height: 1;
+  text-align: right;
+  color: var(--text);
+}
+
+.size-row__sentence {
+  grid-column: 1 / -1;
+  max-width: 52ch;
+  margin: 0;
+  color: var(--text-muted);
+}

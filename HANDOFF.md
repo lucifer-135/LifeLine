@@ -6,8 +6,8 @@ Use this file to resume after compaction or a session limit. **Update it after e
 
 ## Status
 
-- **Last updated:** 2026-10-30, Task 11 complete; Task 12 in progress (cloud build session, subagent-driven).
-- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: Task 12 (Outage day page). Part A (playback hook, room state, running metrics) is committed; part B (the page) is in progress.
+- **Last updated:** 2026-10-30, Task 12 complete; Tasks 13–14 in review/progress (cloud build session, subagent-driven).
+- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: Task 13 review, Task 14 (Method page), then Task 15.
 - **Repo:** GitHub `lucifer-135/LifeLine` (private). Work branch `claude/modest-gauss-c677cd`, draft PR to `main`. Original local clone: `C:\Shivansh\Projects\Global-Energy-Hackathon`.
 - **Files present:**
   - `CLAUDE.md`
@@ -47,7 +47,7 @@ Keep this in sync with PLAN.md.
 | 9 | Shared components | done | CountUp renders the number twice (animated aria-hidden + visually hidden final value). |
 | 10 | Home | done | Browser-checked at 375–1440 px with headless Chromium, including reduced motion. Hero scene in `src/pages/HeroScene.tsx`. Redeploy needs the user. |
 | 11 | Hospital profile | done | Browser-checked 320–1440 px; sticky summary never covers a focused field. Re-picking the selected preset reloads it (discards edits). |
-| 12 | Outage day | todo | demo money shot |
+| 12 | Outage day | done | Browser-checked: 16× median step 25.5 ms; no timer leaks on leave/return; no NaN/tier codes in the DOM; room labels follow cause (Paused = Lifeline shed, No power = unserved). Bundle 825 kB (Recharts) — build warning only. |
 | 13 | Plan & finance, proposal | todo | |
 | 14 | Method & sources | todo | |
 | 15 | Polish, a11y, README, deploy | todo | |

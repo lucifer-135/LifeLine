@@ -21,6 +21,13 @@ Read the ones relevant to your task before changing code.
 - Interface text comes from DESIGN.md §8. Every default number needs an entry in `src/data/sources.ts`, and number values come from HANDOFF.md.
 - The UI says "life-critical", "essential" and "can wait". It never shows T1, T2 or T3.
 
+## No AI attribution
+- Do not mention Claude, Anthropic, or AI assistance anywhere in the repository, except in the project docs (`CLAUDE.md`, `PLAN.md`, `DESIGN.md`, `HANDOFF.md`).
+- This covers code, comments, README, config, and test files.
+- Commit messages and PR descriptions must not mention Claude or AI. Do not add `Co-Authored-By`, `Generated with`, or similar trailers or footers.
+- Do not add Claude, or any bot, as an author, committer, or contributor.
+- Write commit messages as plain descriptions of the change.
+
 ## Working rules
 1. **Plan first.** Read PLAN.md, restate the task, and outline the approach before editing. Small, obvious fixes can skip the outline.
 2. **Lock the stack.** Use the approved stack and existing libraries. Ask before adding or replacing a dependency.

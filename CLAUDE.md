@@ -1,7 +1,7 @@
 # CLAUDE.md
 
 ## Project
-Lifeline is a static web app for the Global Energy Hackathon 2026 (Anneru Solutions, Oct 30 – Nov 1, 2026). It sizes solar, battery and diesel for Nigerian hospitals, simulates an outage day that keeps life-critical loads powered, and shows the Energy-as-a-Service finance case. The approved spec is `docs/superpowers/specs/2026-10-30-lifeline-design.md` (tracked in git).
+Lifeline is a static web app for the Global Energy Hackathon 2026 (Anneru Solutions, Oct 30 – Nov 1, 2026). It sizes solar, battery and inverter for Nigerian hospitals (keeping the existing diesel generator as backup), simulates an outage day that keeps life-critical loads powered, and shows the Energy-as-a-Service finance case. The approved spec is `docs/superpowers/specs/2026-10-30-lifeline-design.md` (tracked in git).
 
 **Deadline first.** The demo path must always work and be deployed: Home → "Simulate an outage" → Outage day plays → Plan → Download proposal.
 

@@ -4,6 +4,8 @@ Lifeline sizes solar, batteries and an inverter for Nigerian hospitals, alongsid
 
 Built for the Global Energy Hackathon 2026 (Anneru Solutions), Availability pillar, non-residential (healthcare) track.
 
+**Live demo:** [lifeline-eight-murex.vercel.app](https://lifeline-eight-murex.vercel.app/)
+
 ![Outage day at 03:00: the grid is down, the battery carries the hospital, life-critical wards stay lit and the controller has paused loads that can wait](docs/screenshot-outage-day.png)
 
 ## The problem

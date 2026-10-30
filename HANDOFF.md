@@ -6,8 +6,8 @@ Use this file to resume after compaction or a session limit. **Update it after e
 
 ## Status
 
-- **Last updated:** 2026-10-30, All 15 PLAN tasks complete; whole-branch review in progress (cloud build session, subagent-driven).
-- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: whole-branch review and its fix wave, the agreed history rewrite, then PR ready for review. After that: Vercel deploy (needs the user), demo video, submission.
+- **Last updated:** 2026-10-30, All 15 PLAN tasks complete, whole-branch review done and its fixes merged into the branch (cloud build session, subagent-driven).
+- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: the user reviews and merges the PR, deploys to Vercel, records the demo video and submits. See "Next steps".
 - **Repo:** GitHub `lucifer-135/LifeLine` (private). Work branch `claude/modest-gauss-c677cd`, draft PR to `main`. Original local clone: `C:\Shivansh\Projects\Global-Energy-Hackathon`.
 - **Files present:**
   - `CLAUDE.md`
@@ -101,7 +101,7 @@ We entered the non-residential (healthcare) track.
    - The battery is sized to night energy × min(1, longest outage ÷ night hours).
    - PV is sized for the **worst month** of irradiance.
    - The twin runs a warm-up day, so the starting battery charge is realistic.
-   - ~~The controller sheds loads based on battery energy only and keeps diesel for emergencies.~~ **Changed 2026-10-30 (user decision after the final review):** loads that can wait still pause on battery energy alone, but essential loads pause only when battery energy above the reserve plus the diesel the generator can deliver until the grid returns or the sun is strong cannot carry them.
+   - ~~The controller sheds loads based on battery energy only and keeps diesel for emergencies.~~ **Changed 2026-10-30 (user decision after the final review):** loads that can wait still pause on battery energy alone, but essential loads pause only when battery energy above the reserve plus the diesel the generator can deliver until the grid returns or the sun is strong cannot carry them. Diesel is credited to essential loads only when the generator alone could carry life-critical load (rating ≥ life-critical peak net of solar, and a day's fuel ≥ a day's life-critical need), and only the fuel beyond the rest of the day's life-critical need. Checked on ~577,000 simulated days: life-critical is never worse than under the battery-only rule.
    - The baseline has a 15-minute generator start gap at each outage.
 6. **Design direction: "Light stays on".**
    - Background is ward-night indigo, and lamp amber appears only where power is delivered.
@@ -197,7 +197,7 @@ Do not cite the Kano hospital's system size: one source says a 7 MW solar projec
 
 ## Open risks
 
-- **Controller trade-off (after the 2026-10-30 change).** Diesel now covers essential load before it is paused, so Lifeline never leaves essential loads unpowered longer than diesel-only on seeds 1–300 (was 40/300 typical, 59/300 rainy for kano-50). The cost: loads that can wait pause longer (kano-50 rainy seed 2026: 255 → 435 min) and Lifeline burns a little diesel (mean +₦6.4K/day typical, +₦9.5K rainy). Life-critical stays at 0 minutes unpowered on all 1,200 checked runs. "Simulate an outage" always resets to the typical day.
+- **Controller trade-off (after the 2026-10-30 change).** Diesel now covers essential load before it is paused, so Lifeline never leaves essential loads unpowered longer than diesel-only on seeds 1–300 (was 40/300 typical, 59/300 rainy for kano-50). The cost: loads that can wait pause longer (kano-50 rainy seed 2026: 255 → 435 min) and Lifeline burns a little diesel (mean +₦6.4K/day typical, +₦9.5K rainy). Life-critical stays at 0 minutes unpowered on all 1,200 preset runs and is never worse than the battery-only rule on ~577,000 custom/edge runs. Where the generator is too small to carry life-critical load alone, essential loads fall back to battery-only pausing. "Simulate an outage" always resets to the typical day.
 
 - **Fonts.** Resolved: "Atkinson Hyperlegible Next" is on Google Fonts (CSS request returns 200, checked 2026-10-30).
 - **Judging criteria are unknown.** The design covers the likely axes: impact, feasibility, innovation, the demo, business model and scalability.

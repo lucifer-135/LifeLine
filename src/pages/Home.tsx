@@ -33,10 +33,12 @@ export function Home() {
   const { dispatch } = useApp()
   const { navigate } = useHashRoute()
 
-  // Reset to the demo hospital and day, even after the user has edited them.
+  // Reset to the demo hospital and day, even after the user has edited them. The season
+  // is part of the day: the demo always replays the same typical one.
   const simulateOutage = () => {
     dispatch({ type: 'loadPreset', presetId: DEMO_PRESET_ID })
     dispatch({ type: 'setSeed', seed: DEMO_SEED })
+    dispatch({ type: 'setSeason', season: 'typical' })
     navigate('outage', 'autoplay=1')
   }
 

@@ -1,7 +1,7 @@
 import { useId } from 'react'
 import type { Comparison } from '../../engine/compare'
 import type { CostAssumptions, FinanceResult, HospitalProfile, Season, TwinMetrics } from '../../engine/types'
-import { formatDuration, formatNgn } from '../../lib/format'
+import { formatDuration, formatKg, formatLitres, formatNgn } from '../../lib/format'
 import { formatContractYears, investorFigures } from './figures'
 
 const SEASON_LABELS: Record<Season, string> = {
@@ -12,9 +12,6 @@ const SEASON_LABELS: Record<Season, string> = {
 // "30 October 2026". The locale is fixed so the date reads the same on every machine.
 const formatToday = () =>
   new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-
-const formatLitres = (litres: number) => `${Math.round(litres)} L`
-const formatKg = (kg: number) => `${Math.round(kg)} kg`
 
 // The same four-pane lit window as the nav mark. print.css colours it for paper.
 function Mark() {
@@ -161,8 +158,8 @@ export function Proposal({ profile, season, costs, comparison, finance }: Propos
         <ul className="proposal__method">
           <li>Loads come from the equipment list: rated power, share of time in use and quantity, hour by hour.</li>
           <li>
-            The battery covers the night part of the longest outage, the panels are sized for the cloudiest month,
-            and life-critical loads are never shed.
+            The battery covers the night part of the longest outage, the panels are sized for the month with the least
+            sun, and life-critical loads are never shed.
           </li>
           <li>
             Costs follow the assumptions in the Lifeline plan: diesel and grid prices, equipment prices, operating

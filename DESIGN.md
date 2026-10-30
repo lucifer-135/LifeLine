@@ -441,7 +441,7 @@ The numbers in the wireframe are illustrative. Real values come from the engine.
 ```
 
 - **SizeCards.** These are datasheet rows, not cards: one row each with an icon, label, value in Archivo 800 stretch 75% at 36px, and one sentence. The sentences are:
-  - **Solar:** "{pv} kWp of panels, sized for {worstMonth} — the cloudiest month in {state}."
+  - **Solar:** "{pv} kWp of panels, sized for {worstMonth} — the month with the least sun in {state}."
   - **Battery:** "{bat} kWh of lithium (LFP) storage, enough to carry life-critical and essential loads through the night."
   - **Inverter:** "{inv} kW, with 25% headroom over the peak of life-critical and essential loads."
 - **FinancePanel.**
@@ -468,7 +468,7 @@ The numbers in the wireframe are illustrative. Real values come from the engine.
 - **Limits copy** (a list):
   - "Simulates one representative day, not a full year."
   - "Equipment ratings are typical values, not a site audit. Field tests found real draw differs from labels by −45% to +56%."
-  - "Prices are from October 2026 and change fast; edit them on the plan page."
+  - "Prices were checked in October 2026 (diesel is the May 2026 NBS average) and change fast; edit them on the plan page."
   - "The grid outage pattern is generated, not measured. Real feeder data would replace it in a pilot."
 
 ---

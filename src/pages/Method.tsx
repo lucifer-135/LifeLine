@@ -25,7 +25,7 @@ const STRONG_SUN_WINDOW = `${hourLabel(PV_STRONG_START_HOUR)}–${hourLabel(PV_S
 const LIMITS = [
   'Simulates one representative day, not a full year.',
   'Equipment ratings are typical values, not a site audit. Field tests found real draw differs from labels by −45% to +56%.',
-  'Prices are from October 2026 and change fast; edit them on the plan page.',
+  'Prices were checked in October 2026 (diesel is the May 2026 NBS average) and change fast; edit them on the plan page.',
   'The grid outage pattern is generated, not measured. Real feeder data would replace it in a pilot.',
 ]
 
@@ -130,8 +130,14 @@ export function Method() {
           </p>
           <p>
             Solar covers the daytime part of an outage, so the battery only has to cover the night.
-            Solar is sized for the cloudiest month of the hospital’s state, so the system
-            still holds in the rains.
+            Solar is sized for the month with the least sun in the hospital’s state (August in
+            most states, when the rains are heaviest).
+          </p>
+          <p>
+            The {BATTERY_DOD} usable, {BATTERY_ROUND_TRIP} round trip, {PV_PERFORMANCE_RATIO}{' '}
+            performance ratio and {INVERTER_HEADROOM} headroom factors and the {RESERVE_PERCENT}{' '}
+            battery reserve are model settings, not sourced values, so they are not in the Sources
+            table.
           </p>
         </section>
 
@@ -149,8 +155,8 @@ export function Method() {
             </li>
             <li>
               In an outage, the controller looks ahead to the next time the grid returns or the sun
-              is strong ({STRONG_SUN_WINDOW}). It compares the energy the loads need until then with
-              the battery energy above a {RESERVE_PERCENT} reserve.
+              is strong ({STRONG_SUN_WINDOW}). It compares the energy the loads need after solar until
+              then with the battery energy above a {RESERVE_PERCENT} reserve.
             </li>
             <li>
               If the battery cannot carry everything, it pauses loads that can wait first, then
@@ -166,8 +172,8 @@ export function Method() {
           <h3>Today: diesel only</h3>
           <p>
             Each outage starts with a {STEP_MINUTES}-minute gap while the generator is started by
-            hand. After that the generator serves life-critical load first, then the rest, until
-            the fuel runs out.
+            hand. After that the generator serves life-critical load first, up to its rating, then
+            the rest, until the fuel runs out.
           </p>
         </section>
 
@@ -207,7 +213,7 @@ export function Method() {
             Rows tagged Estimate are planning values, not measurements.
           </p>
           <table className="sources-table">
-            <caption className="caption">Every default number in Lifeline, with its source</caption>
+            <caption className="caption">Sourced values in Lifeline, with their source and date</caption>
             <thead>
               <tr>
                 <th scope="col">Value</th>

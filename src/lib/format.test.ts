@@ -1,5 +1,14 @@
 import { expect, test } from 'vitest'
-import { formatDuration, formatNgn, formatPct, formatUsd, formatYears } from './format'
+import {
+  formatDuration,
+  formatKg,
+  formatLitres,
+  formatNgn,
+  formatPct,
+  formatRunway,
+  formatUsd,
+  formatYears,
+} from './format'
 
 test('formatDuration: under an hour shows minutes only', () => {
   expect(formatDuration(0)).toBe('0m')
@@ -25,6 +34,22 @@ test('formatDuration: negative reads as 0m, non-finite as a dash', () => {
   expect(formatDuration(Number.NaN)).toBe('—')
   expect(formatDuration(Infinity)).toBe('—')
   expect(formatDuration(-Infinity)).toBe('—')
+})
+
+test('formatRunway: up to 99 hours reads like formatDuration', () => {
+  expect(formatRunway(45)).toBe('45m')
+  expect(formatRunway(680)).toBe('11h 20m')
+  expect(formatRunway(99 * 60)).toBe('99h 0m')
+})
+
+test('formatRunway: above 99 hours reads "over 99h", however large', () => {
+  expect(formatRunway(99 * 60 + 1)).toBe('over 99h')
+  expect(formatRunway(6e11)).toBe('over 99h')
+})
+
+test('formatRunway: non-finite reads as a dash, never "over 99h"', () => {
+  expect(formatRunway(Infinity)).toBe('—')
+  expect(formatRunway(Number.NaN)).toBe('—')
 })
 
 test('formatters: the brief examples', () => {
@@ -134,4 +159,33 @@ test('formatYears: one decimal and the unit; null or non-finite reads n/a', () =
   expect(formatYears(0.0878)).toBe('0.1 yrs')
   expect(formatYears(Number.NaN)).toBe('n/a')
   expect(formatYears(Infinity)).toBe('n/a')
+})
+
+test('formatLitres: whole litres with comma grouping', () => {
+  expect(formatLitres(0)).toBe('0 L')
+  expect(formatLitres(12.4)).toBe('12 L')
+  expect(formatLitres(12.6)).toBe('13 L')
+  expect(formatLitres(1_234.5)).toBe('1,235 L')
+  expect(formatLitres(2_000_000)).toBe('2,000,000 L')
+})
+
+test('formatKg: whole kilograms with comma grouping', () => {
+  expect(formatKg(0)).toBe('0 kg')
+  expect(formatKg(999.4)).toBe('999 kg')
+  expect(formatKg(4_521.2)).toBe('4,521 kg')
+  expect(formatKg(-1_234.5)).toBe('-1,234 kg')
+})
+
+test('formatLitres and formatKg: a value that rounds to zero has no minus sign', () => {
+  expect(formatLitres(-0.3)).toBe('0 L')
+  expect(formatKg(-0.3)).toBe('0 kg')
+})
+
+test('formatLitres and formatKg: non-finite values read n/a, never Infinity or NaN', () => {
+  for (const bad of [Number.NaN, Infinity, -Infinity]) {
+    expect(formatLitres(bad)).toBe('n/a')
+    expect(formatKg(bad)).toBe('n/a')
+  }
+  // The diesel CO₂ factor can be set to 1e307, which overflows once it multiplies the litres.
+  expect(formatKg(1e307 * 3_000)).toBe('n/a')
 })

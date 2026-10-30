@@ -49,11 +49,13 @@ function StateProbe() {
   const leaveDemo = () => {
     dispatch({ type: 'loadPreset', presetId: 'phc' })
     dispatch({ type: 'setSeed', seed: 7 })
+    dispatch({ type: 'setSeason', season: 'worst' })
   }
   return (
     <>
       <output data-testid="preset">{state.profile.id}</output>
       <output data-testid="seed">{state.seed}</output>
+      <output data-testid="season">{state.season}</output>
       <button type="button" onClick={leaveDemo}>
         Leave the demo state
       </button>
@@ -96,12 +98,14 @@ describe('Home', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Leave the demo state' }))
     expect(screen.getByTestId('preset')).toHaveTextContent('phc')
     expect(screen.getByTestId('seed')).toHaveTextContent('7')
+    expect(screen.getByTestId('season')).toHaveTextContent('worst')
 
     fireEvent.click(screen.getByRole('button', { name: 'Simulate an outage' }))
 
     expect(window.location.hash).toBe('#/outage?autoplay=1')
     expect(screen.getByTestId('preset')).toHaveTextContent('kano-50')
     expect(screen.getByTestId('seed')).toHaveTextContent(String(DEMO_SEED))
+    expect(screen.getByTestId('season')).toHaveTextContent('typical')
   })
 
   test('stat strip shows 3 stats with sources', () => {

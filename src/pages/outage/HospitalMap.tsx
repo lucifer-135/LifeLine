@@ -6,7 +6,7 @@ import { TierBadge } from '../../components/TierBadge'
 import type { Equipment, HospitalProfile, TwinResult, TwinStep } from '../../engine/types'
 import { NARROW_LAYOUT, WARD_ROOMS, WIDE_LAYOUT, wallPath } from './mapLayout'
 import type { MapLayout, PlanRoom, WardRoom, WardRoomId } from './mapLayout'
-import { ITEM_STATUS_TEXT, itemKw, itemStatus, roomCondition, roomServedKw } from './roomDetails'
+import { ITEM_STATUS_TEXT, isRoomIdle, itemKw, itemStatus, roomCondition, roomServedKw } from './roomDetails'
 import type { RoomCondition } from './roomDetails'
 import { itemsIn, roomState } from './roomState'
 import type { RoomState } from './roomState'
@@ -95,13 +95,15 @@ interface MapRoomProps {
   state: RoomState
   condition: RoomCondition
   servedKw: number
+  idle: boolean
   open: boolean
   onToggle: () => void
 }
 
-function MapRoom({ room, plan, state, condition, servedKw, open, onToggle }: MapRoomProps) {
+function MapRoom({ room, plan, state, condition, servedKw, idle, open, onToggle }: MapRoomProps) {
   const reduceMotion = useReducedMotion() === true
   const label = CONDITION_LABELS[condition]
+  const served = idle && condition === 'lit' ? 'not in use' : `${servedKw.toFixed(1)} kW served`
   const { x, y, width, height } = plan
 
   function handleKeyDown(event: KeyboardEvent<SVGGElement>) {
@@ -116,7 +118,7 @@ function MapRoom({ room, plan, state, condition, servedKw, open, onToggle }: Map
       data-room={room.id}
       role="button"
       tabIndex={0}
-      aria-label={`${room.name}: ${CONDITION_WORDS[condition]}, ${servedKw.toFixed(1)} kW served`}
+      aria-label={`${room.name}: ${CONDITION_WORDS[condition]}, ${served}`}
       aria-haspopup="dialog"
       aria-expanded={open}
       onClick={onToggle}
@@ -389,6 +391,7 @@ export function HospitalMap({ profile, result, step, pvKwp }: HospitalMapProps) 
               state={state}
               condition={roomCondition(state, items, step, twinStep)}
               servedKw={roomServedKw(items, step, twinStep)}
+              idle={isRoomIdle(items, step)}
               open={openRoom === room.id}
               onToggle={() => toggleRoom(room.id)}
             />

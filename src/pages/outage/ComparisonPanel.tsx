@@ -3,16 +3,13 @@ import { useMemo } from 'react'
 import { CountUp } from '../../components/CountUp'
 import { partialMetrics } from '../../engine/twin'
 import type { CostAssumptions, TwinMetrics, TwinResult } from '../../engine/types'
-import { formatDuration, formatNgn } from '../../lib/format'
+import { formatDuration, formatKg, formatLitres, formatNgn } from '../../lib/format'
 import './ComparisonPanel.css'
 
 // Short, so the totals keep up with playback at 16× (a step every 25 ms).
 const COUNT_MS = 300
 // --dur-base with --ease-out, for the verdict.
 const FADE_IN = { duration: 0.28, ease: [0.22, 1, 0.36, 1] } as const
-
-const formatLitres = (litres: number) => `${Math.round(litres)} L`
-const formatKg = (kg: number) => `${Math.round(kg)} kg`
 
 interface ColumnProps {
   modifier: 'baseline' | 'lifeline'

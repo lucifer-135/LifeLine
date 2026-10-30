@@ -43,7 +43,7 @@ export function SizeCards({ size, stateName, worstMonth }: SizeCardsProps) {
         </dt>
         <dd className="size-row__value live-number">{pv} kWp</dd>
         <dd className="size-row__sentence">
-          {pv} kWp of panels, sized for {month} — the cloudiest month in {stateName}.
+          {pv} kWp of panels, sized for {month} — the month with the least sun in {stateName}.
         </dd>
       </div>
       <div className="size-row">

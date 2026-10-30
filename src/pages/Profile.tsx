@@ -433,7 +433,13 @@ export function Profile() {
                           {message}
                         </button>
                       ) : (
-                        message
+                        <>
+                          {message}
+                          {/* No field here: the cost assumptions are edited on the plan page. */}
+                          <a className="link-like" href="#/plan">
+                            Fix on the plan page
+                          </a>
+                        </>
                       )}
                     </li>
                   )
@@ -449,7 +455,7 @@ export function Profile() {
               type="button"
               className="button button--primary"
               disabled={errors.length > 0}
-              onClick={() => navigate('outage')}
+              onClick={() => navigate('outage', 'autoplay=1')}
             >
               Run outage day
             </button>

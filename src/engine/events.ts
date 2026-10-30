@@ -1,4 +1,4 @@
-import { formatDuration } from '../lib/format'
+import { formatRunway } from '../lib/format'
 import { STEPS_PER_DAY } from './constants'
 import type { TwinEvent } from './types'
 
@@ -16,7 +16,7 @@ export function stepToClock(step: number): string {
 export function formatEvent(e: TwinEvent): string {
   switch (e.kind) {
     case 'grid_lost':
-      return `Grid lost. ICU covered for ${formatDuration(e.t1RunwayMin)}.`
+      return `Grid lost. ICU covered for ${formatRunway(e.t1RunwayMin)}.`
     case 'grid_restored':
       return 'Grid power is back.'
     case 'shed_t3':

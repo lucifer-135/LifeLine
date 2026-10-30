@@ -57,6 +57,12 @@ function servedShare(twinStep: TwinStep, tier: Tier): number {
   return Math.min(1, Math.max(0, twinStep.servedKw[tier] / load))
 }
 
+// Nothing in the room is switched on at this step, so it serves no load at all. A lit room
+// like that reads "not in use" rather than "0.0 kW served", which sounds like a fault.
+export function isRoomIdle(items: Equipment[], step: number): boolean {
+  return items.every((item) => !isScheduled(item, step))
+}
+
 export function roomServedKw(items: Equipment[], step: number, twinStep: TwinStep): number {
   return items.reduce(
     (sum, item) => (isScheduled(item, step) ? sum + itemKw(item) * servedShare(twinStep, item.tier) : sum),

@@ -18,10 +18,17 @@ function pageHeading(name: string) {
   return screen.findByRole('heading', { level: 1, name })
 }
 
+// jsdom's window.scrollTo only logs "not implemented"; a spy keeps the output
+// clean and lets tests see when the app resets the scroll position. It stays
+// installed for the whole file (jsdom is per file): a page that mounted at the
+// very end of a test can still run its effect while RTL cleans up.
+const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
+
 // replaceState does not fire `hashchange`, so each test starts from a clean URL.
 beforeEach(() => {
   window.history.replaceState(null, '', window.location.pathname)
   document.title = ''
+  scrollTo.mockClear()
 })
 
 describe('routing', () => {
@@ -250,11 +257,74 @@ describe('anchors', () => {
 
     await waitFor(() => expect(scrollIntoView).toHaveBeenCalledTimes(1))
     expect(scrollIntoView.mock.contexts[0]).toBe(target)
+    // The anchor decides the position; the page is not also sent to the top.
+    expect(scrollTo).not.toHaveBeenCalled()
   })
 
   test('does not scroll when there is no anchor', async () => {
     renderAt('#/method')
     await pageHeading('Method & sources')
     expect(scrollIntoView).not.toHaveBeenCalled()
+  })
+})
+
+describe('scroll position', () => {
+  test('first load does not touch the scroll position', async () => {
+    renderAt('#/plan')
+    await pageHeading('Plan & finance')
+    expect(scrollTo).not.toHaveBeenCalled()
+  })
+
+  test('a route change without an anchor scrolls to the top', async () => {
+    renderAt('#/plan')
+    await pageHeading('Plan & finance')
+
+    fireEvent.click(screen.getByRole('link', { name: 'Method' }))
+    await pageHeading('Method & sources')
+
+    await waitFor(() => expect(scrollTo).toHaveBeenCalledWith(0, 0))
+    expect(scrollTo).toHaveBeenCalledTimes(1)
+  })
+
+  test('a hash change made outside the app also scrolls to the top', async () => {
+    renderAt('#/outage')
+    await pageHeading('Outage day')
+
+    act(() => {
+      window.location.hash = '#/method'
+    })
+    await pageHeading('Method & sources')
+
+    await waitFor(() => expect(scrollTo).toHaveBeenCalledWith(0, 0))
+  })
+
+  test('each route change resets again, including a return to the first page', async () => {
+    renderAt('#/plan')
+    await pageHeading('Plan & finance')
+
+    fireEvent.click(screen.getByRole('link', { name: 'Method' }))
+    await pageHeading('Method & sources')
+    await waitFor(() => expect(scrollTo).toHaveBeenCalledTimes(1))
+
+    fireEvent.click(screen.getByRole('link', { name: 'Plan & finance' }))
+    await pageHeading('Plan & finance')
+    await waitFor(() => expect(scrollTo).toHaveBeenCalledTimes(2))
+  })
+
+  test('a query change on the same page leaves the scroll position alone', async () => {
+    renderAt('#/outage')
+    await pageHeading('Outage day')
+
+    act(() => {
+      window.location.hash = '#/outage?autoplay=1'
+    })
+    // Hash changes are handled in order, so once the next route has rendered the
+    // query change has been processed too.
+    act(() => {
+      window.location.hash = '#/plan'
+    })
+    await pageHeading('Plan & finance')
+
+    await waitFor(() => expect(scrollTo).toHaveBeenCalledTimes(1))
   })
 })

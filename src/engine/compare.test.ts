@@ -138,8 +138,40 @@ test('daily fuel is a thirtieth of the monthly litres', () => {
   expect(c.lifeline.metrics.dieselLitres).toBeLessThanOrEqual(kano.dieselLitresPerMonth / 30 + 1e-9)
 })
 
+// Few essential loads, three times the loads that can wait, no grid and a tight fuel
+// budget. Diesel credited to essential load used to leave too little for life-critical
+// load overnight.
+function sparseEssentialProfile(generatorKva: number): HospitalProfile {
+  return {
+    ...kano,
+    id: `sparse-essential-${generatorKva}kva`,
+    equipment: kano.equipment.map((e) => {
+      if (e.tier === 'T2') return { ...e, qty: Math.round(e.qty * 0.5) }
+      if (e.tier === 'T3') return { ...e, qty: e.qty * 3 }
+      return e
+    }),
+    gridHoursPerDay: 0,
+    dieselLitresPerMonth: 150,
+    generatorKva,
+  }
+}
+
+test('diesel credited to essential load never leaves life-critical load short later', () => {
+  for (const generatorKva of [60, 10]) {
+    for (const season of ['typical', 'worst'] as const) {
+      const c = runComparison({
+        profile: sparseEssentialProfile(generatorKva),
+        costs: DEFAULT_COSTS,
+        seed: DEMO_SEED,
+        season,
+      })
+      expect(c.lifeline.metrics.t1MinutesUnpowered, `${generatorKva} kVA ${season}`).toBe(0)
+    }
+  }
+})
+
 test('Lifeline never leaves life-critical or essential load dark longer than today', () => {
-  for (const profile of [kano, presetById('phc')]) {
+  for (const profile of [kano, presetById('phc'), sparseEssentialProfile(60)]) {
     for (const season of ['typical', 'worst'] as const) {
       for (let seed = 1; seed <= 50; seed++) {
         const c = runComparison({ profile, costs: DEFAULT_COSTS, seed, season })

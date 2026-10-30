@@ -47,7 +47,7 @@ describe('Method page structure', () => {
     render(<Method />)
     const intro = screen.getByRole('heading', { level: 1 }).closest('header')?.textContent ?? ''
     expect(intro).toContain(
-      'Every sourced default value is listed with its source and date, and the model settings are explained where they are used.',
+      'Every sourced default value is listed with its source, and its date where known. The model settings are explained where they are used.',
     )
     expect(intro).not.toMatch(/where each number comes from/i)
   })
@@ -107,7 +107,7 @@ describe('How the controller decides', () => {
     render(<Method />)
     const controller = sectionOf('How the controller decides').textContent ?? ''
     expect(controller).toContain(
-      'Loads that can wait are paused first, whenever the battery alone cannot carry everything. Before pausing essential loads, the controller also counts the diesel the generator can supply until the grid returns or the sun is strong.',
+      'Loads that can wait are paused first, whenever the battery alone cannot carry everything. Before pausing essential loads, the controller also counts the diesel the generator can supply until the grid returns or the sun is strong. It counts only fuel that life-critical load will not need for the rest of the day, and only if the generator and a day’s fuel could carry life-critical load on their own.',
     )
     expect(controller).not.toMatch(/kept for emergencies/i)
   })

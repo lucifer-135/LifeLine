@@ -47,6 +47,10 @@ const CUT_ORDER: Tier[] = ['T3', 'T2', 'T1']
 interface TwinContext {
   input: TwinInput
   pvKw: number[]
+  // Life-critical energy (kWh) the battery or diesel must still supply from each step to
+  // the end of the day. The last entry, after the final step, is 0.
+  lifeCriticalNeedToDayEndKwh: number[]
+  dieselCarriesLifeCritical: boolean
 }
 
 // State carried from one step into the next.
@@ -101,8 +105,11 @@ function litresBurned(dieselKw: number, litresPerKwh: number): number {
 
 // Minutes the battery plus remaining fuel could last at this step's draw. Fuel counts
 // only if there is a generator to burn it in. `drawKw` is the load the scenario serves
-// from storage: Lifeline passes life-critical load only, because shedding protects it;
-// the baseline never sheds, so every tier burns the same fuel and it passes the total.
+// from storage. Lifeline passes life-critical load only: other loads are paused before
+// the battery runs short, and essential loads get only fuel that life-critical load will
+// not need before the day's refill. While essential loads share the battery and the
+// generator, the figure is an upper bound. The baseline never sheds, so every tier
+// burns the same fuel and it passes the total.
 function t1RunwayMin(
   input: TwinInput,
   gridUp: boolean,
@@ -148,6 +155,31 @@ function allocateServed(loadKw: TierKw, shed: Shedding, unservedKw: number): Tie
   return served
 }
 
+// Life-critical energy (kWh) the battery or diesel must supply from each step to the end
+// of the day: grid-down steps only, net of PV.
+function lifeCriticalNeedToDayEnd(input: TwinInput, pvKw: number[]): number[] {
+  const needKwh = Array<number>(STEPS_PER_DAY + 1).fill(0)
+  for (let k = STEPS_PER_DAY - 1; k >= 0; k--) {
+    const netKw = input.grid.up[k] ? 0 : Math.max(0, input.load.kw.T1[k] - pvKw[k])
+    needKwh[k] = needKwh[k + 1] + netKw * STEP_HOURS
+  }
+  return needKwh
+}
+
+// Whether the generator alone could keep life-critical load on through every grid-down
+// step: its rating covers the peak and one day's fuel covers the whole day. Only then
+// can battery and spare fuel go to essential loads without life-critical load later
+// depending on the charge they used, today or after the warm-up day.
+function dieselCarriesLifeCritical(input: TwinInput, pvKw: number[], dayNeedKwh: number): boolean {
+  const peakKw = Math.max(
+    0,
+    ...pvKw.map((pv, k) => (input.grid.up[k] ? 0 : input.load.kw.T1[k] - pv)),
+  )
+  const litresPerKwh = input.costs.dieselLitresPerKwh
+  const dayFuelKwh = litresPerKwh > 0 ? input.fuelLitresPerDay / litresPerKwh : Infinity
+  return input.generatorKw > 0 && input.generatorKw >= peakKw && dayFuelKwh >= dayNeedKwh
+}
+
 // --- Lifeline controller ---
 
 function isStrongPvStep(k: number): boolean {
@@ -183,21 +215,29 @@ function stepsUntilRelief(s: number, relief: number): number {
   return relief === s ? STEPS_PER_DAY : (relief - s + STEPS_PER_DAY) % STEPS_PER_DAY
 }
 
-// Diesel energy (kWh) the generator can still deliver before relief: capped by its
-// rating over the window and by the fuel left. A zero or negative fuel rate means free
-// running, as in `dieselLimitKw`.
-function dieselEnergyUntilRelief(input: TwinInput, fuelLeft: number, steps: number): number {
-  if (input.generatorKw <= 0) return 0
-  const ratingKwh = input.generatorKw * steps * STEP_HOURS
+// Diesel energy (kWh) the controller may count for essential loads until relief: what
+// the generator's rating allows over the window, from fuel that life-critical load will
+// not need before the day's refill. A zero or negative fuel rate means free running, as
+// in `dieselLimitKw`.
+function spareDieselUntilReliefKwh(
+  ctx: TwinContext,
+  s: number,
+  relief: number,
+  fuelLeft: number,
+): number {
+  if (!ctx.dieselCarriesLifeCritical) return 0
+  const { input } = ctx
+  const ratingKwh = input.generatorKw * stepsUntilRelief(s, relief) * STEP_HOURS
   const litresPerKwh = input.costs.dieselLitresPerKwh
   const fuelKwh = litresPerKwh > 0 ? fuelLeft / litresPerKwh : Infinity
-  return Math.max(0, Math.min(ratingKwh, fuelKwh))
+  const spareFuelKwh = fuelKwh - ctx.lifeCriticalNeedToDayEndKwh[s]
+  return Math.max(0, Math.min(ratingKwh, spareFuelKwh))
 }
 
 // Loads that can wait are kept on only if the battery above its reserve can carry
 // everything until relief, so diesel is never burned for them. Essential loads (ward
-// lighting, refrigeration) also count the diesel the generator can deliver until
-// relief, so they are not paused while the generator could still carry them.
+// lighting, refrigeration) also count the spare diesel until relief, so they are not
+// paused while the generator could still carry them.
 function decideShedding(
   previous: Shedding,
   needAllKwh: number,
@@ -216,7 +256,7 @@ function outageShedding(ctx: TwinContext, s: number, start: StepStart): Shedding
   const relief = findReliefStep(ctx.input.grid, s)
   const batteryKwh =
     Math.max(0, start.soc - BATTERY_RESERVE_SOC) * ctx.input.size.batteryKwh * BATTERY_ONE_WAY
-  const dieselKwh = dieselEnergyUntilRelief(ctx.input, start.fuelLeft, stepsUntilRelief(s, relief))
+  const dieselKwh = spareDieselUntilReliefKwh(ctx, s, relief, start.fuelLeft)
   return decideShedding(
     start,
     energyNeeded(ctx, s, relief, ALL_TIERS),
@@ -472,11 +512,16 @@ function runDay(ctx: TwinContext, stepFunction: StepFunction, first: StepStart):
 // realistic starting charge. Fuel is refilled each day; everything else carries over.
 export function runTwin(input: TwinInput): TwinResult {
   const stepFunction = stepFunctionFor(input.scenario)
+  const pvKw = Array.from({ length: STEPS_PER_DAY }, (_, s) =>
+    pvOutputKw(input.size.pvKwp, input.psh, s),
+  )
+  const lifeCriticalNeedToDayEndKwh = lifeCriticalNeedToDayEnd(input, pvKw)
+  const dayNeedKwh = lifeCriticalNeedToDayEndKwh[0]
   const ctx: TwinContext = {
     input,
-    pvKw: Array.from({ length: STEPS_PER_DAY }, (_, s) =>
-      pvOutputKw(input.size.pvKwp, input.psh, s),
-    ),
+    pvKw,
+    lifeCriticalNeedToDayEndKwh,
+    dieselCarriesLifeCritical: dieselCarriesLifeCritical(input, pvKw, dayNeedKwh),
   }
   // A missing battery holds no charge, so the gauge reads empty rather than half full.
   const warmUpStart: StepStart = {

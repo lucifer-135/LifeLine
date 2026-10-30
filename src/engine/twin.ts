@@ -99,20 +99,22 @@ function litresBurned(dieselKw: number, litresPerKwh: number): number {
   return litresPerKwh > 0 ? dieselKw * STEP_HOURS * litresPerKwh : 0
 }
 
-// Minutes the battery plus remaining fuel could carry life-critical load at this
-// step's demand. Fuel counts only if there is a generator to burn it in.
+// Minutes the battery plus remaining fuel could last at this step's draw. Fuel counts
+// only if there is a generator to burn it in. `drawKw` is the load the scenario serves
+// from storage: Lifeline passes life-critical load only, because shedding protects it;
+// the baseline never sheds, so every tier burns the same fuel and it passes the total.
 function t1RunwayMin(
   input: TwinInput,
   gridUp: boolean,
   soc: number,
   fuelLeft: number,
-  t1Kw: number,
+  drawKw: number,
 ): number {
   if (gridUp) return Infinity
   const litresPerKwh = input.costs.dieselLitresPerKwh
   const fuelKwh = input.generatorKw > 0 && litresPerKwh > 0 ? fuelLeft / litresPerKwh : 0
   const batteryKwh = soc * input.size.batteryKwh * BATTERY_ONE_WAY
-  return ((batteryKwh + fuelKwh) / Math.max(t1Kw, EPS)) * 60
+  return ((batteryKwh + fuelKwh) / Math.max(drawKw, EPS)) * 60
 }
 
 // --- load helpers ---
@@ -355,7 +357,7 @@ function baselineStep(ctx: TwinContext, s: number, start: StepStart): TwinStep {
     dieselKw,
     soc: 0,
     fuelLitresLeft,
-    t1RunwayMin: t1RunwayMin(input, gridUp, 0, fuelLitresLeft, loadKw.T1),
+    t1RunwayMin: t1RunwayMin(input, gridUp, 0, fuelLitresLeft, demandKw),
   }
 }
 

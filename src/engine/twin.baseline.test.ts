@@ -4,8 +4,16 @@ import { PRESETS } from '../data/presets'
 import { SOLAR_SITES } from '../data/solarSites'
 import { runComparison } from './compare'
 import { DEMO_SEED } from './constants'
+import { formatEvent } from './events'
 import { runTwin, type TwinInput } from './twin'
-import type { GridPattern, HospitalProfile, LoadProfile, TwinResult, TwinStep } from './types'
+import type {
+  GridPattern,
+  HospitalProfile,
+  LoadProfile,
+  TwinEvent,
+  TwinResult,
+  TwinStep,
+} from './types'
 
 const LITRES_PER_KWH = DEFAULT_COSTS.dieselLitresPerKwh
 
@@ -223,10 +231,20 @@ test('runway counts fuel only, and only if there is a generator', () => {
   const r = baseline()
   r.steps.forEach((s) => {
     if (s.gridUp) expect(s.t1RunwayMin).toBe(Infinity)
-    else expect(s.t1RunwayMin).toBeCloseTo((s.fuelLitresLeft / LITRES_PER_KWH / 1) * 60, 6)
+    else expect(s.t1RunwayMin).toBeCloseTo((s.fuelLitresLeft / LITRES_PER_KWH / 3) * 60, 6)
   })
   const noGenerator = baseline({ generatorKw: 0 })
   noGenerator.steps.filter((s) => !s.gridUp).forEach((s) => expect(s.t1RunwayMin).toBe(0))
+})
+
+test('runway divides fuel by every load the generator serves, not just life-critical', () => {
+  // 0.9 L is 3 kWh of diesel. The three tiers draw 3 kW together, so one hour of fuel.
+  const r = baseline({ fuelLitresPerDay: 0.9 })
+  const gridLost = r.events.find((e) => e.kind === 'grid_lost')
+  expect(gridLost?.t1RunwayMin).toBeCloseTo(60, 9)
+  expect(formatEvent(gridLost as TwinEvent)).toBe('Grid lost. ICU covered for 1h 0m.')
+  // One full step of diesel (3 kW for 15 min = 0.225 L) leaves 2.25 kWh, so 45 min.
+  expect(r.steps[71].t1RunwayMin).toBeCloseTo(45, 9)
 })
 
 test('baseline energy balance holds in every edge case', () => {
@@ -292,4 +310,24 @@ test('baseline is deterministic for the demo seed', () => {
   const run = () =>
     runComparison({ profile: kano, costs: DEFAULT_COSTS, seed: DEMO_SEED, season: 'typical' })
   expect(run().baseline).toEqual(run().baseline)
+})
+
+test('baseline grid_lost runway on kano-50 is below the life-critical-only figure', () => {
+  const { baseline: b } = runComparison({
+    profile: kano,
+    costs: DEFAULT_COSTS,
+    seed: DEMO_SEED,
+    season: 'typical',
+  })
+  const lost = b.events.filter((e) => e.kind === 'grid_lost')
+  expect(lost.length).toBeGreaterThan(0)
+  lost.forEach((e) => {
+    const step = b.steps[e.step]
+    const fuelKwh = step.fuelLitresLeft / LITRES_PER_KWH
+    const totalKw = step.loadKw.T1 + step.loadKw.T2 + step.loadKw.T3
+    // The old figure (fuel over life-critical load alone) overstated the cover.
+    const t1OnlyRunwayMin = (fuelKwh / step.loadKw.T1) * 60
+    expect(e.t1RunwayMin).toBeCloseTo((fuelKwh / totalKw) * 60, 6)
+    expect(e.t1RunwayMin).toBeLessThan(t1OnlyRunwayMin)
+  })
 })

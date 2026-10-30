@@ -1,0 +1,312 @@
+/* Hospital profile (DESIGN §6.1). Mobile first for the page; the equipment table
+   is a normal table from 768px and stacks into blocks below it. */
+
+.profile {
+  display: grid;
+  gap: var(--s-6);
+  padding-block: var(--s-6) var(--s-7);
+}
+
+/* Preset picker */
+
+.profile-start {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-4);
+}
+
+.profile-start__label {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* Site and Power today: side by side from 768px. */
+
+.profile-panels {
+  display: grid;
+  gap: var(--s-4);
+}
+
+.profile-panels h2 {
+  margin-bottom: var(--s-4);
+}
+
+.profile-fields {
+  display: grid;
+  gap: var(--s-4);
+}
+
+.profile-fields--pair {
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+}
+
+/* The native select, dressed like NumberField's input so the two read as one family. */
+
+.profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+}
+
+.profile-field__label {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.profile-select {
+  min-width: 0;
+  min-height: 44px;
+  padding: var(--s-2) var(--s-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-control);
+  background: var(--night-900);
+  color: var(--text);
+}
+
+/* Equipment */
+
+.profile-equipment {
+  display: grid;
+  gap: var(--s-4);
+}
+
+.profile-equipment__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--s-4);
+}
+
+.profile-add {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--s-3);
+}
+
+.profile-equipment__empty {
+  color: var(--text-muted);
+}
+
+.equipment-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.equipment-table th,
+.equipment-table td {
+  padding: var(--s-2);
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.equipment-table thead th {
+  background: var(--night-700);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+
+/* The ward name is the row group's header: a band above its items. */
+.equipment-table__ward-row th {
+  background: var(--night-800);
+  font-size: var(--fs-md);
+  font-weight: 700;
+}
+
+.equipment-row__name {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.equipment-row__label {
+  display: none;
+}
+
+/* The three number columns have a fixed width, so the item name takes the rest
+   of the row. The input must not size the cell: an input's own width is about
+   170px, which would squeeze the name into a sliver. */
+.equipment-row__field {
+  width: 7rem;
+}
+
+.equipment-row__field .number-field__input {
+  width: 0;
+}
+
+.equipment-row__priority,
+.equipment-row__remove {
+  white-space: nowrap;
+}
+
+/* Below 768px each item is a block: name and badge, the three fields in one
+   row, then Remove. A flex row wraps by itself. The name takes whatever the
+   badge leaves, so the badge sits beside it, and the fields wrap below. */
+@media (max-width: 767.98px) {
+  .equipment-table,
+  .equipment-table tbody,
+  .equipment-table tr,
+  .equipment-table th,
+  .equipment-table td {
+    display: block;
+  }
+
+  /* The cell labels below stand in for the header row; assistive tech still reads it. */
+  .equipment-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .equipment-table th,
+  .equipment-table td {
+    padding: 0;
+    border-bottom: 0;
+  }
+
+  .equipment-table tbody + tbody {
+    margin-top: var(--s-4);
+  }
+
+  .equipment-table__ward-row th {
+    padding: var(--s-2) var(--s-3);
+    border-radius: var(--r-control);
+  }
+
+  .equipment-table .equipment-row {
+    --badge-room: 9rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2);
+    padding: var(--s-3);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .equipment-row__name {
+    flex: 1 1 calc(100% - var(--badge-room) - var(--s-2));
+    min-width: 0;
+  }
+
+  .equipment-row__priority {
+    flex: none;
+  }
+
+  .equipment-row__field {
+    flex: 1 1 calc((100% - 2 * var(--s-2)) / 3);
+    width: auto;
+    min-width: 0;
+  }
+
+  .equipment-row__label {
+    display: block;
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  .equipment-row__remove {
+    flex: 1 1 100%;
+  }
+}
+
+/* Dock: the errors and the summary stay at the bottom of the screen. */
+
+.profile-dock {
+  position: sticky;
+  bottom: 0;
+  z-index: var(--z-sticky);
+  border-top: 1px solid var(--line);
+  background: var(--night-950);
+}
+
+.profile-dock__inner {
+  display: grid;
+  gap: var(--s-3);
+  padding-block: var(--s-3);
+}
+
+/* Fields keep clear of the dock when focus scrolls them into view. */
+.profile-page :is(input, select, button) {
+  scroll-margin-bottom: calc(var(--dock-h, 7.5rem) + var(--s-4));
+}
+
+.profile-errors {
+  max-height: 30dvh;
+  overflow-y: auto;
+  padding: var(--s-2) var(--s-4);
+  border: 1px solid var(--warn);
+  border-radius: var(--r-control);
+  background: var(--night-900);
+}
+
+.profile-errors ul {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.profile-errors li {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+/* A button that reads as a link: it moves focus to a field, which a hash link
+   would break (the hash is the route). */
+.link-like {
+  padding: var(--s-2) 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-color: var(--warn);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.profile-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3) var(--s-5);
+}
+
+.profile-summary__text {
+  flex: 1 1 24ch;
+  max-width: none;
+  font-size: var(--fs-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 767.98px) {
+  /* Two long names do not fit side by side, so the preset options stack as a
+     list inside a rounded box instead of a pill. */
+  .profile-start .segmented {
+    display: grid;
+    width: 100%;
+    border-radius: var(--r-panel);
+  }
+
+  .profile-start .segmented__option {
+    border-radius: var(--r-control);
+    text-align: left;
+  }
+}
+
+@media (min-width: 768px) {
+  .profile-panels {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s-5);
+  }
+}

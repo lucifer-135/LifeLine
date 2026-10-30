@@ -36,6 +36,10 @@
   color: var(--alarm);
 }
 
+.runway__status--idle {
+  color: var(--text);
+}
+
 .runway__label {
   color: var(--text-muted);
   font-weight: 500;

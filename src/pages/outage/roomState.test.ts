@@ -135,7 +135,9 @@ describe('roomState', () => {
     test('a T1 item that is off by its schedule does not raise the alarm', () => {
       const profile = profileOf(item('Theatre', 'T1', { scheduleMask: hours(8, 16) }))
       const result = resultWith(8, { servedKw: { T1: 0, T2: 1, T3: 1 } })
-      expect(roomState('Theatre', 8, result, profile)).toBe('lit')
+      // No alarm; the idle room is dark only because the hospital's life-critical supply failed.
+      expect(roomState('Theatre', 8, result, profile)).not.toBe('alarm')
+      expect(roomState('Theatre', 8, result, profile)).toBe('dark')
     })
 
     test('T1 shortfall of 1e-9 or less is rounding, not an alarm', () => {
@@ -250,11 +252,23 @@ describe('roomState', () => {
       expect(roomState('Lab', STEP, result, profile)).toBe('lit')
     })
 
-    test('a ward with no active items is lit', () => {
+    // A room with nothing switched on has no load of its own, so its light shows whether
+    // the hospital has power: life-critical load served means the supply is there.
+    test('a ward with no active items is lit while life-critical load is served', () => {
       const profile = profileOf(item('Lab', 'T3', { scheduleMask: hours(8, 9) }))
       const result = resultWith(STEP, { shedT3: true, servedKw: { T1: 1, T2: 1, T3: 0 } })
       expect(roomState('Lab', STEP, result, profile)).toBe('lit')
       expect(roomState('Admin', STEP, result, profile)).toBe('lit')
+    })
+
+    test('a ward with no active items is dark while life-critical load is under-served', () => {
+      const profile = profileOf(item('Lab', 'T3', { scheduleMask: hours(8, 9) }))
+      const blackout = resultWith(STEP, { servedKw: { T1: 0, T2: 0, T3: 0 } })
+      expect(roomState('Lab', STEP, blackout, profile)).toBe('dark')
+      expect(roomState('Admin', STEP, blackout, profile)).toBe('dark')
+
+      const partial = resultWith(STEP, { servedKw: { T1: 0.5, T2: 1, T3: 1 } })
+      expect(roomState('Lab', STEP, partial, profile)).toBe('dark')
     })
   })
 
@@ -322,6 +336,15 @@ describe('roomState', () => {
         const t1Short = s.servedKw.T1 < s.loadKw.T1 - 1e-9
         expect(stateAt(baseline, step, 'ICU') === 'alarm').toBe(t1Short)
       })
+    })
+
+    test('no ward is lit in the baseline while its life-critical load goes unserved', () => {
+      const blackoutSteps = baseline.steps.flatMap((s, step) => (s.servedKw.T1 < s.loadKw.T1 - 1e-9 ? [step] : []))
+      expect(blackoutSteps.length).toBeGreaterThan(0)
+      const lit = blackoutSteps.flatMap((step) =>
+        rooms.filter((ward) => stateAt(baseline, step, ward) === 'lit').map((ward) => `${ward}@${step}`),
+      )
+      expect(lit).toEqual([])
     })
 
     test('every ward is lit while the grid is up', () => {

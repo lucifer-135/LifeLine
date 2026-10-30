@@ -5,6 +5,7 @@ import { PRESETS } from '../data/presets'
 import { runComparison } from '../engine/compare'
 import { DEMO_SEED } from '../engine/constants'
 import { stepToClock } from '../engine/events'
+import { partialMetrics } from '../engine/twin'
 import { formatDuration, formatNgn } from '../lib/format'
 import { AppProvider, useApp } from '../state/AppState'
 import { OutageDay } from './OutageDay'
@@ -55,6 +56,11 @@ function chooseScenario(name: 'With Lifeline' | 'Today: diesel only') {
 
 function runway(): HTMLElement {
   return screen.getByRole('region', { name: 'ICU runway' })
+}
+
+// The ward rooms on the floor plan: buttons whose name is "{Room}: {state}, … kW served".
+function roomButtons(): HTMLElement[] {
+  return screen.getAllByRole('button', { name: /kW served$/ })
 }
 
 function advance(ms: number) {
@@ -121,6 +127,20 @@ describe('OutageDay', () => {
         expect(within(column).getByText(expected, { selector: '.visually-hidden' })).toBeInTheDocument()
       }
     }
+  })
+
+  test('the running totals cover the day so far, not the whole day', () => {
+    const midDay = firstOutageStep + 4
+    const soFar = Math.round(partialMetrics(demo.baseline, midDay, DEFAULT_COSTS).dieselLitres)
+    const fullDay = Math.round(demo.baseline.metrics.dieselLitres)
+    expect(soFar).not.toBe(fullDay)
+    renderOutage()
+    seek(midDay)
+
+    const baseline = screen.getByRole('heading', { name: 'Today: diesel only' }).closest('div')
+    if (!baseline) throw new Error('The diesel-only column has no container')
+    expect(within(baseline).getByText(`${soFar} L`, { selector: '.visually-hidden' })).toBeInTheDocument()
+    expect(within(baseline).queryByText(`${fullDay} L`, { selector: '.visually-hidden' })).not.toBeInTheDocument()
   })
 
   test('invalid profile shows link back to profile instead of charts', () => {
@@ -218,6 +238,62 @@ describe('OutageDay', () => {
     fireEvent.keyDown(dialog, { key: 'Escape' })
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     expect(icu).toHaveFocus()
+  })
+
+  test('diesel only at the first outage: no room is lit and none reads as paused', () => {
+    renderOutage()
+    chooseScenario('Today: diesel only')
+    seek(firstOutageStep)
+
+    const plan = screen.getByRole('group', { name: 'Hospital floor plan' })
+    for (const room of roomButtons()) {
+      expect(room.getAttribute('aria-label')).not.toMatch(/: (lit|paused|partly paused),/)
+      expect(room.getAttribute('aria-label')).toMatch(/: no power,/)
+    }
+    expect(within(plan).queryByText('Paused')).not.toBeInTheDocument()
+    expect(within(plan).queryByText('Partly paused')).not.toBeInTheDocument()
+    // The theatre runs office hours only, so at night it is dark for want of power, not paused.
+    expect(screen.getByRole('button', { name: /^Theatre: no power,/ })).toBeInTheDocument()
+  })
+
+  test('with Lifeline, loads it sheds still read as paused', () => {
+    expect(demo.lifeline.steps[firstOutageStep].shedT3).toBe(true)
+    renderOutage()
+    seek(firstOutageStep)
+    const plan = screen.getByRole('group', { name: 'Hospital floor plan' })
+    expect(screen.getByRole('button', { name: /^Wards: partly paused,/ })).toBeInTheDocument()
+    expect(within(plan).getByText('Partly paused')).toBeInTheDocument()
+    expect(within(plan).queryByText('No power')).not.toBeInTheDocument()
+  })
+
+  test('opening another room moves focus into its popover', () => {
+    renderOutage()
+    const icu = screen.getByRole('button', { name: /^ICU: / })
+    icu.focus()
+    fireEvent.keyDown(icu, { key: 'Enter' })
+    expect(screen.getByRole('button', { name: 'Close' })).toHaveFocus()
+
+    const theatre = screen.getByRole('button', { name: /^Theatre: / })
+    theatre.focus()
+    fireEvent.keyDown(theatre, { key: 'Enter' })
+    const dialog = screen.getByRole('dialog', { name: 'Theatre equipment' })
+    expect(within(dialog).getByRole('button', { name: 'Close' })).toHaveFocus()
+
+    fireEvent.keyDown(dialog, { key: 'Escape' })
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(theatre).toHaveFocus()
+  })
+
+  test('headings never skip a level, also with a room popover open', () => {
+    renderOutage()
+    fireEvent.click(screen.getByRole('button', { name: /^Admin: / }))
+    expect(screen.getByRole('dialog', { name: 'Admin equipment' })).toBeInTheDocument()
+
+    const levels = screen.getAllByRole('heading').map((heading) => Number(heading.tagName.slice(1)))
+    expect(levels[0]).toBe(1)
+    levels.forEach((level, i) => {
+      if (i > 0) expect(level).toBeLessThanOrEqual(levels[i - 1] + 1)
+    })
   })
 
   test('the room popover marks unpowered life-critical items and idle ones', () => {

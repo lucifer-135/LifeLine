@@ -6,8 +6,8 @@ Use this file to resume after compaction or a session limit. **Update it after e
 
 ## Status
 
-- **Last updated:** 2026-10-30, Task 4 complete (cloud build session, subagent-driven).
-- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: Task 5 (digital twin, Lifeline controller).
+- **Last updated:** 2026-10-30, Task 5 complete (cloud build session, subagent-driven).
+- **Phase:** Building PLAN.md tasks in order on branch `claude/modest-gauss-c677cd`. Next: Task 6 (baseline scenario, runComparison, event copy).
 - **Repo:** GitHub `lucifer-135/LifeLine` (private). Work branch `claude/modest-gauss-c677cd`, draft PR to `main`. Original local clone: `C:\Shivansh\Projects\Global-Energy-Hackathon`.
 - **Files present:**
   - `CLAUDE.md`
@@ -38,7 +38,7 @@ Keep this in sync with PLAN.md.
 | 2 | Engine types, data, validation | done | 53 SOURCES rows (cost, stat, solar, equip, site). Engine constants have no source rows; the Method page explains them. |
 | 3 | Loads, solar shape, grid pattern | done | kano-50: life-critical 109.8, essential 90.3, can wait 98.1 kWh/day (298 total). |
 | 4 | Sizing | done | kano-50, seed 2026: battery 85 kWh, PV 41 kWp, inverter 12 kW (longest outage 7.5 h). |
-| 5 | Twin: Lifeline | todo | |
+| 5 | Twin: Lifeline | done | kano-50 seed 2026: life-critical 0 min dark, essential 0 min, 0 L diesel, 109.9 kWh grid, ₦23,017/day. Fuzz-checked energy balance. |
 | 6 | Twin: baseline, comparison, event copy | todo | |
 | 7 | Finance and formatters | todo | |
 | 8 | App shell, state, router, tokens | todo | |
@@ -193,6 +193,8 @@ Do not cite the Kano hospital's system size: one source says a 7 MW solar projec
 3. Remind the user to ask a mentor about the deadline and the judging categories.
 
 ## Open risks
+
+- **Controller sheds on battery charge only (HANDOFF decision 5).** On some seeds (1–20) Lifeline pauses essential loads for up to 405 min/day while using under 3 L of the 50 L/day diesel. The demo seed 2026 sheds nothing. If judges try "New day", the essential-load comparison can favour the diesel-only baseline. A possible change: let diesel cover essential load before shedding it. That needs a decision and test updates.
 
 - **Fonts.** If "Atkinson Hyperlegible Next" is not on Google Fonts, fall back to "Atkinson Hyperlegible" (DESIGN.md §3).
 - **Judging criteria are unknown.** The design covers the likely axes: impact, feasibility, innovation, the demo, business model and scalability.
